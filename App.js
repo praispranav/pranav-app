@@ -1,10 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View , Text } from "react-native";
 import * as Font from "expo-font";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
-import AppNavigator from "./navigation/AppNavigator";
+import  AppNavigator from "./navigation/AppNavigator";
+
 
 const INITIAL_STATE_LOADING = {
   loadingFont: true,
@@ -26,7 +27,7 @@ export default function App() {
   useEffect(() => {
     loadFonts();
   }, []);
-  if (loading.loadingFont) return <View />;
+  if (loading.loadingFont) return (<View ><Text>LoadLoading Loading Loading Loadaskldkasjdksajkdjklasjklasjkdasjklasjkldsajing</Text></View>);
 
   return (
     <SafeAreaProvider>

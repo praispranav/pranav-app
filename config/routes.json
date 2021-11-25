@@ -1,0 +1,5 @@
+{
+    "home":"HomeScreen",
+    "login":"LoginScreen",
+    "signup":"SignUpScreen"
+}

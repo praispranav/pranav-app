@@ -1,4 +1,3 @@
-import HomeScreen from '../screens/HomeScreen'
 import DrawerNavigator from "./DrawerNavigator"
 
 export const AppNavigatorList = [
@@ -8,9 +7,5 @@ export const AppNavigatorList = [
         options: {
             headerShown: false,
         }
-    },
-    {
-        name: "Home",
-        component: HomeScreen,
     },
 ]
