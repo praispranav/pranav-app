@@ -63,7 +63,7 @@
 //          <TouchableOpacity onPress={() => props.navigation.navigate("Profile")}>
 //           <Text>Go To Profile</Text>
 //         </TouchableOpacity>
-//       </View> 
+//       </View>
 //       <DrawerItemList {...props} />
 //     </DrawerContentScrollView>
 //   );
@@ -102,75 +102,246 @@
 //   );
 // }
 
-import * as React from 'react';
-import { Button, View, TouchableOpacity } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import * as React from "react";
+import { Button, View, TouchableOpacity } from "react-native";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 // import { NavigationContainer } from '@react-navigation/native';
 import LoginScreen from "../screens/Login";
-import SighUpScreen from "../screens/Signup"
+import SighUpScreen from "../screens/Signup";
 import HomeScreen from "../screens/HomeScreen";
-import AntDesign from "react-native-vector-icons/AntDesign"
-
-
-function HomeScreen2({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Button
-        onPress={() => navigation.navigate('Notifications')}
-        title="Go to notifications"
-      />
-    </View>
-  );
-}
+import AntDesign from "react-native-vector-icons/AntDesign";
+import FruitAndVegetables from "./FruitsAndVegetables";
+import theme from "../config/theme";
+import NewsPaperScreen from "../screens/NewsPaper";
+import DairyProducts from "../screens/DairyProducts"
 
 function NotificationsScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Button onPress={() => navigation.goBack()} title="Go back home" />
     </View>
   );
 }
 
-const theme = {
-  backgroundColor: "red",
-  border: "red",
-  grey: 'rgb(170,170,170)',
-  lightgrey: "rgb(245,245,245)",
-  backgroundCOlorlightt: '#ef9a9a'
-}
+// const theme = {
+//   backgroundColor: "red",
+//   border: "red",
+//   grey: "rgb(170,170,170)",
+//   lightgrey: "rgb(245,245,245)",
+//   backgroundColorlight: "#ef9a9a",
+// };
 
 const Drawer = createDrawerNavigator();
 
 export default function App() {
   return (
     <Drawer.Navigator initialRouteName="Home">
-      <Drawer.Screen options={({navigation}) => {
-        return {
-          title: 'Company Name', 
-          headerTitleAlign: 'center',
-          headerTitleStyle:{fontFamily: 'PT_Sansbold', marginTop: 5 },
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("LoginScreen")}
-              style={{ width: 35, height: 35, borderRadius: 25, display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: theme.backgroundCOlorlightt, marginRight: 15, marginTop: 5 }}
-            >
-              <AntDesign name="user" size={15} color="white" />
-            </TouchableOpacity>
-          ),
-          headerLeft: () => (
-            <TouchableOpacity
-              onPress={() => navigation.openDrawer()              }
-              style={{ width: 35, height: 35, borderRadius: 25, display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: theme.backgroundCOlorlightt, marginLeft: 15, marginTop: 5 }}
-            >
-              <AntDesign name="bars" size={15} color="white" />
-            </TouchableOpacity>
-          ),
-          headerShadowVisible: false
-        }
-      }} name="HomeScreen" component={HomeScreen} />
-      <Drawer.Screen name="NotificationScreen" component={NotificationsScreen} />
-      <Drawer.Screen options={{ headerShown: false }} name="SignUpScreen" component={SighUpScreen} />
-      <Drawer.Screen options={{ headerShown: false }} name="LoginScreen" component={LoginScreen} />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Company Name",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name="HomeScreen"
+        component={HomeScreen}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Fruits & Vegetables",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Fruits & Vegetables`}
+        component={FruitAndVegetables}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "News Paper",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Newspaper`}
+        component={NewsPaperScreen}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Dairy Products",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Dairy Products`}
+        component={DairyProducts}
+      />
+      <Drawer.Screen
+        name="NotificationScreen"
+        component={NotificationsScreen}
+      />
+      <Drawer.Screen
+        options={{ headerShown: false }}
+        name="SignUpScreen"
+        component={SighUpScreen}
+      />
+      <Drawer.Screen
+        options={{ headerShown: false }}
+        name="LoginScreen"
+        component={LoginScreen}
+      />
     </Drawer.Navigator>
   );
 }
