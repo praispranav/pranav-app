@@ -19,25 +19,23 @@ const Data = [
     id: "1",
     name: "The Times Of India",
     image: require("../assets/img/vegetables.jpg"),
-    unit: "kg",
     price: "100",
-    priceUnit: " month"
+    priceUnit: "month"
   },
   {
     id: "2",
     name: "The Hindu",
     image: require("../assets/img/vegetables.jpg"),
-    unit: "kg",
     price: "2000",
-    priceUnit: " year"
+    priceUnit: "year"
   },
   {
     id: "3",
     name: "Hindustan",
     image: require("../assets/img/vegetables.jpg"),
-    unit: "kg",
+    
     price: "1000",
-    priceUnit: " quarter"
+    priceUnit: "quarter"
   },
   {
     id: "4",

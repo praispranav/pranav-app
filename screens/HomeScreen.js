@@ -10,6 +10,9 @@ import { Spacing } from "../constants/MarginPadding";
 import Text from "../elements/Text";
 import Ionic from "react-native-vector-icons/Ionicons";
 import theme from "../config/theme";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Entypo from "react-native-vector-icons/Entypo";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 // const theme = {
 //     backgroundColor: "red",
@@ -29,35 +32,46 @@ const products = [
   },
   {
     label: "Tifin",
-    icon: (
-      <Ionic size={25} color={theme.backgroundColor} name="fast-food-outline" />
-    ),
+    icon: <Entypo size={25} color={theme.backgroundColor} name="box" />,
     additionalInfo: null,
     action: ({ navigation }) => navigation.navigate("Tifin"),
   },
   {
     label: "Newspaper",
-    icon: (
-      <Ionic size={25} color={theme.backgroundColor} name="fast-food-outline" />
-    ),
+    icon: <Entypo size={25} color={theme.backgroundColor} name="news" />,
     additionalInfo: null,
     action: ({ navigation }) => navigation.navigate("Newspaper"),
   },
   {
     label: "Flowers",
-    icon: (
-      <Ionic size={25} color={theme.backgroundColor} name="fast-food-outline" />
-    ),
+    icon: <Entypo size={25} color={theme.backgroundColor} name="flower" />,
     additionalInfo: null,
     action: ({ navigation }) => navigation.navigate("Flowers"),
   },
   {
     label: "Fruits & Vegetables",
     icon: (
-      <Ionic size={25} color={theme.backgroundColor} name="fast-food-outline" />
+      <MaterialCommunityIcons
+        size={25}
+        color={theme.backgroundColor}
+        name="fruit-grapes"
+      />
     ),
     additionalInfo: null,
     action: ({ navigation }) => navigation.navigate("Fruits & Vegetables"),
+  },
+  {
+    label: "Grocery",
+    icon: (
+      <MaterialCommunityIcons
+        size={25}
+        color={theme.backgroundColor}
+        name="fruit-grapes"
+      />
+    ),
+    additionalInfo: null,
+    action: ({ navigation }) => navigation.navigate("Fruits & Vegetables"),
+    disabled: true,
   },
 ];
 
@@ -99,11 +113,29 @@ export default function HomeScreen({ navigation }) {
               justifyContent: "center",
               display: "flex",
               alignItems: "center",
+              backgroundColor: item.disabled ? theme.grey : "white",
             }}
-            onPress={()=> item.action({ navigation: navigation })}
+            activeOpacity={item.disabled ? 1 : 0.3}
+            onPress={() =>
+              item.disabled
+                ? console.log("")
+                : item.action({ navigation: navigation })
+            }
           >
-            {item.icon}
-            <Text style={{ marginTop: Spacing.Small }}>{item.label}</Text>
+            {item.disabled ? (
+              <Text style={{ color: "white" }}>Comming Soon</Text>
+            ) : (
+              item.icon
+            )}
+
+            <Text
+              style={{
+                marginTop: Spacing.Small,
+                color: item.disabled ? "white" : "black",
+              }}
+            >
+              {item.label}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>

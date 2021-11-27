@@ -110,10 +110,13 @@ import LoginScreen from "../screens/Login";
 import SighUpScreen from "../screens/Signup";
 import HomeScreen from "../screens/HomeScreen";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FruitAndVegetables from "./FruitsAndVegetables";
 import theme from "../config/theme";
 import NewsPaperScreen from "../screens/NewsPaper";
-import DairyProducts from "../screens/DairyProducts"
+import DairyProducts from "../screens/DairyProducts";
+import CartScreen from "../screens/CartScreen";
+import OrderHistory from "./OrderHistory";
 
 function NotificationsScreen({ navigation }) {
   return (
@@ -143,40 +146,76 @@ export default function App() {
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
             headerRight: () => (
-              <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 25,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: theme.backgroundColorlight,
-                  marginRight: 15,
-                  marginTop: 5,
-                }}
-              >
-                <AntDesign name="user" size={15} color="white" />
-              </TouchableOpacity>
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("CartScreen")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginRight: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="shoppingcart" size={15} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("LoginScreen")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginRight: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="user" size={15} color="white" />
+                </TouchableOpacity>
+              </View>
             ),
             headerLeft: () => (
-              <TouchableOpacity
-                onPress={() => navigation.openDrawer()}
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 25,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: theme.backgroundColorlight,
-                  marginLeft: 15,
-                  marginTop: 5,
-                }}
-              >
-                <AntDesign name="bars" size={15} color="white" />
-              </TouchableOpacity>
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => navigation.openDrawer()}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginLeft: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="bars" size={15} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("History")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginLeft: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <FontAwesome5 name="history" size={15} color="white" />
+                </TouchableOpacity>
+              </View>
             ),
             headerShadowVisible: false,
           };
@@ -305,6 +344,56 @@ export default function App() {
               </TouchableOpacity>
             ),
             headerLeft: () => (
+              <>
+                <TouchableOpacity
+                  onPress={() => navigation.openDrawer()}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginLeft: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="bars" size={15} color="white" />
+                </TouchableOpacity>
+              </>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`CartScreen`}
+        component={CartScreen}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Dairy Products",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
               <TouchableOpacity
                 onPress={() => navigation.openDrawer()}
                 style={{
@@ -331,6 +420,74 @@ export default function App() {
       <Drawer.Screen
         name="NotificationScreen"
         component={NotificationsScreen}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "History",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerRight: () => (
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("CartScreen")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginRight: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="shoppingcart" size={15} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("LoginScreen")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginRight: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="user" size={15} color="white" />
+                </TouchableOpacity>
+              </View>
+            ),
+            headerLeft: () => (
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={() => navigation.openDrawer()}
+                  style={{
+                    width: 35,
+                    height: 35,
+                    borderRadius: 25,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: theme.backgroundColorlight,
+                    marginLeft: 15,
+                    marginTop: 5,
+                  }}
+                >
+                  <AntDesign name="bars" size={15} color="white" />
+                </TouchableOpacity>
+              </View>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name="History"
+        component={OrderHistory}
       />
       <Drawer.Screen
         options={{ headerShown: false }}
