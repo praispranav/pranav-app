@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  FlatList,
   TouchableOpacity,
   View,
   Text,
@@ -292,177 +291,21 @@ export default function ProductHistory({ navigation }) {
           Active
         </TextFont>
 
-        <FlatList
-          data={dataActive}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const checkDays = (currentDay) => {
-              const a = item.days.findIndex((dayCh) => dayCh === currentDay);
-              if (a !== -1) return true;
-              return false;
-            };
-            return (
-              <View>
-                <View
-                  style={[
-                    styles.mainContainer,
-                    {
-                      backgroundColor: getBackgroundColor(item.status),
-                      flexWrap: "wrap",
-                    },
-                  ]}
-                >
-                  <View style={{ position: "relative" }}>
-                    <Image
-                      source={item.image}
-                      style={{ borderRadius: 5, width: 70, height: 70 }}
-                    />
-                    <View style={styles.whiteBadge}>
-                      <Text>{item.id}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.childContainer}>
-                    <View>
-                      <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                        {item.name}
-                      </Text>
-                      <View style={getBadgeColor(item.status)}>
-                        <Text style={styles.statusStyle}>{item.status}</Text>
-                      </View>
-                      <Text
-                        style={{
-                          color: "black",
-                          fontSize: Font.Small,
-                          marginTop: Spacing.ExtraSmall,
-                        }}
-                      >
-                        {item.availableQuantity[0] + " " + item.unit} --{" "}
-                        {moment(item.orderDate).format("YYYY-MM-DD")}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        alignSelf: "flex-end",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>
-                        Total
-                      </Text>
-                      <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}>
-                        {" "}
-                        Amount
-                      </Text>
-                      <Text>{item.price}</Text>
-                    </View>
-                    {/* <Text>
-                  Order Date: {moment(item.orderDate).format("YYYY/MM/DD")}
-                </Text> */}
-                    {/* <View style={styles.blueBadge2}>
-                </View> */}
-                  </View>
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      marginTop: Spacing.Large,
-                    }}
-                  >
-                    {days.map((day) => (
-                      <TouchableOpacity
-                        // onPress={() =>
-                        //   handleDaySelector(subscriptionIndex, item.days, day)
-                        // }
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          paddingHorizontal: 10,
-                          height: 20,
-                          borderRadius: 50,
-                          backgroundColor: checkDays(day)
-                            ? theme.backgroundColor
-                            : theme.lightgrey,
-                        }}
-                      >
-                        <Text
-                          style={{ color: checkDays(day) ? "white" : "black" }}
-                        >
-                          {day}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                  <View
-                    style={{
-                      width: "100%",
-                      marginTop: Spacing.Small,
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <TouchableOpacity
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingHorizontal: 10,
-                        height: 20,
-                        borderRadius: 50,
-                        backgroundColor: theme.green2,
-                      }}
-                    >
-                      <Text style={{ color: "white", fontSize: Font.Small }}>Cancel Today</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingHorizontal: 10,
-                        height: 20,
-                        borderRadius: 50,
-                        backgroundColor: theme.green2,
-                        marginLeft: 10
-                      }}
-                    >
-                      <Text style={{ color: "white", fontSize: Font.Small }}>Edit Days</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            );
-          }}
-        />
-        <TextFont
-          style={{
-            fontSize: 17,
-            marginTop: 10,
-            marginLeft: 10,
-            fontFamily: "PT_SansBold",
-          }}
-        >
-          Others
-        </TextFont>
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            return (
+        {dataActive.map((item) => {
+          const checkDays = (currentDay) => {
+            const a = item.days.findIndex((dayCh) => dayCh === currentDay);
+            if (a !== -1) return true;
+            return false;
+          };
+          return (
+            <View>
               <View
                 style={[
                   styles.mainContainer,
-                  { backgroundColor: getBackgroundColor(item.status) },
+                  {
+                    backgroundColor: getBackgroundColor(item.status),
+                    flexWrap: "wrap",
+                  },
                 ]}
               >
                 <View style={{ position: "relative" }}>
@@ -515,10 +358,158 @@ export default function ProductHistory({ navigation }) {
                   {/* <View style={styles.blueBadge2}>
                 </View> */}
                 </View>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginTop: Spacing.Large,
+                  }}
+                >
+                  {days.map((day) => (
+                    <TouchableOpacity
+                      // onPress={() =>
+                      //   handleDaySelector(subscriptionIndex, item.days, day)
+                      // }
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingHorizontal: 10,
+                        height: 20,
+                        borderRadius: 50,
+                        backgroundColor: checkDays(day)
+                          ? theme.backgroundColor
+                          : theme.lightgrey,
+                      }}
+                    >
+                      <Text
+                        style={{ color: checkDays(day) ? "white" : "black" }}
+                      >
+                        {day}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <View
+                  style={{
+                    width: "100%",
+                    marginTop: Spacing.Small,
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingHorizontal: 10,
+                      height: 20,
+                      borderRadius: 50,
+                      backgroundColor: theme.green2,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: Font.Small }}>
+                      Cancel Today
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingHorizontal: 10,
+                      height: 20,
+                      borderRadius: 50,
+                      backgroundColor: theme.green2,
+                      marginLeft: 10,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: Font.Small }}>
+                      Edit Days
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          );
+        })}
+        <TextFont
+          style={{
+            fontSize: 17,
+            marginTop: 10,
+            marginLeft: 10,
+            fontFamily: "PT_SansBold",
+          }}
+        >
+          Others
+        </TextFont>
+       {data.map((item) => {
+            return (
+              <View
+                style={[
+                  styles.mainContainer,
+                  { backgroundColor: getBackgroundColor(item.status) },
+                ]}
+              >
+                <View style={{ position: "relative" }}>
+                  <Image
+                    source={item.image}
+                    style={{ borderRadius: 5, width: 70, height: 70 }}
+                  />
+                  <View style={styles.whiteBadge}>
+                    <Text>{item.id}</Text>
+                  </View>
+                </View>
+                <View style={styles.childContainer}>
+                  <View>
+                    <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+                      {item.name}
+                    </Text>
+                    <View style={getBadgeColor(item.status)}>
+                      <Text style={styles.statusStyle}>{item.status}</Text>
+                    </View>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontSize: Font.Small,
+                        marginTop: Spacing.ExtraSmall,
+                      }}
+                    >
+                      {item.availableQuantity[0] + " " + item.unit} --{" "}
+                      {moment(item.orderDate).format("YYYY-MM-DD")}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      alignSelf: "flex-end",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>
+                      Total
+                    </Text>
+                    <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}>
+                      {" "}
+                      Amount
+                    </Text>
+                    <Text>{item.price}</Text>
+                  </View>
+                  
+                </View>
               </View>
             );
-          }}
-        />
+          })}
       </ScrollView>
     </View>
   );

@@ -144,7 +144,7 @@ export default function App() {
           return {
             title: "Company Name",
             headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <View style={{ display: "flex", flexDirection: "row" }}>
                 <TouchableOpacity
@@ -228,7 +228,7 @@ export default function App() {
           return {
             title: "Fruits & Vegetables",
             headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
                 onPress={() => navigation.navigate("LoginScreen")}
@@ -276,7 +276,7 @@ export default function App() {
           return {
             title: "News Paper",
             headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
                 onPress={() => navigation.navigate("LoginScreen")}
@@ -324,7 +324,7 @@ export default function App() {
           return {
             title: "Dairy Products",
             headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
                 onPress={() => navigation.navigate("LoginScreen")}
@@ -374,7 +374,7 @@ export default function App() {
           return {
             title: "Dairy Products",
             headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
                 onPress={() => navigation.navigate("LoginScreen")}
@@ -426,7 +426,7 @@ export default function App() {
           return {
             title: "History",
             headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_Sansbold", marginTop: 5 },
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <View style={{ display: "flex", flexDirection: "row" }}>
                 <TouchableOpacity

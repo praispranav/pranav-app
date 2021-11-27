@@ -108,12 +108,12 @@ export default function HomeScreen({ navigation }) {
               marginTop: "5%",
               height: 90,
               borderWidth: 2,
-              borderColor: theme.backgroundColor,
+              borderColor: !item.disabled ? theme.backgroundColor: "grey",
               borderRadius: 10,
               justifyContent: "center",
               display: "flex",
               alignItems: "center",
-              backgroundColor: item.disabled ? theme.grey : "white",
+              backgroundColor:  "white",
             }}
             activeOpacity={item.disabled ? 1 : 0.3}
             onPress={() =>
@@ -123,15 +123,15 @@ export default function HomeScreen({ navigation }) {
             }
           >
             {item.disabled ? (
-              <Text style={{ color: "white" }}>Comming Soon</Text>
-            ) : (
-              item.icon
+              <Text style={{ color: "black" }}>Comming Soon</Text>
+              ) : (
+                item.icon
             )}
 
             <Text
               style={{
                 marginTop: Spacing.Small,
-                color: item.disabled ? "white" : "black",
+                color:  "black",
               }}
             >
               {item.label}

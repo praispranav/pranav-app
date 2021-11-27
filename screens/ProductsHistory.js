@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  FlatList,
-  TouchableOpacity,
   View,
   Text,
   StyleSheet,
@@ -170,10 +168,7 @@ export default function ProductHistory({ navigation }) {
   };
   return (
     <View style={styles.screen}>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
+      {data.map(( item ) => {
           return (
             <View
               style={[
@@ -231,9 +226,8 @@ export default function ProductHistory({ navigation }) {
                 </View> */}
               </View>
             </View>
-          );
-        }}
-      />
+          )})
+        }
     </View>
   );
 }
