@@ -87,13 +87,15 @@ export default function LoginScreen(props) {
             <View style={styles.screen}>
                 <View style={styles.navigationContainer}>
                     <Button textStyle={{ color: "black" }} onPress={()=> {
-                        console.warn("CLicked")
                         props.navigation.navigate(routes.login)}} text="Login" />
                     <Button containerStyle={{ backgroundColor: theme.backgroundColor, borderRadius: Spacing.ExtraLarge }} textStyle={{ color: "white" }} text="Signup" />
                 </View>
                 <View style={{ marginVertical: Spacing.ExtraLarge }}>
                     <View style={{ marginTop: Spacing.ExtraLarge + 15 }}>
                         <Input placeholder={"Enter Your Email Here"} />
+                    </View>
+                    <View style={{ marginTop: Spacing.ExtraLarge + 15 }}>
+                        <Input placeholder={"Enter Your Name"} />
                     </View>
 
                     <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>

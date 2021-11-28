@@ -14,7 +14,7 @@ import { Spacing } from "../constants/MarginPadding";
 import TextFont from "../elements/Text";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import moment from "moment";
-import DateTimePicker from "@react-native-community/datetimepicker";
+// import DateTimePicker from "@react-native-community/datetimepicker";
 
 const styles = StyleSheet.create({
   screen: {
@@ -244,7 +244,7 @@ export default function CartScreen() {
                           </Text>
                         </TouchableOpacity>
                       </View>
-                      {fromDateVisible && (
+                      {/* {fromDateVisible && (
                         <DateTimePicker
                           onChange={() => console.log("hello")}
                           value={new Date()}
@@ -259,7 +259,7 @@ export default function CartScreen() {
                           display="default"
                           mode="date"
                         />
-                      )}
+                      )} */}
                       <View
                         style={{
                           marginLeft: Spacing.Medium,

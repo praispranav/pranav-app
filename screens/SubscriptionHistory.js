@@ -4,14 +4,13 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
+  Image,ScrollView, Touchable
 } from "react-native";
 import theme from "../config/theme";
 import { Font } from "../constants/Fonts";
 import TextFont from "../elements/Text";
 import { Spacing } from "../constants/MarginPadding";
 import moment from "moment";
-import { ScrollView } from "react-native-gesture-handler";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"];
 
@@ -298,7 +297,7 @@ export default function ProductHistory({ navigation }) {
             return false;
           };
           return (
-            <View>
+            <TouchableOpacity onPress={()=> navigation.navigate("Subscription Detail")}>
               <View
                 style={[
                   styles.mainContainer,
@@ -440,7 +439,7 @@ export default function ProductHistory({ navigation }) {
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         })}
         <TextFont
@@ -455,7 +454,7 @@ export default function ProductHistory({ navigation }) {
         </TextFont>
        {data.map((item) => {
             return (
-              <View
+              <TouchableOpacity onPress={()=> navigation.navigate("Subscription Detail")}
                 style={[
                   styles.mainContainer,
                   { backgroundColor: getBackgroundColor(item.status) },
@@ -507,7 +506,7 @@ export default function ProductHistory({ navigation }) {
                   </View>
                   
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })}
       </ScrollView>
