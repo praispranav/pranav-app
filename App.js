@@ -5,7 +5,9 @@ import * as Font from "expo-font";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import  AppNavigator from "./navigation/AppNavigator";
+import axios from 'axios'
 
+axios.defaults.baseURL = "https://hris-app-backend.azurewebsites.net"
 
 const INITIAL_STATE_LOADING = {
   loadingFont: true,

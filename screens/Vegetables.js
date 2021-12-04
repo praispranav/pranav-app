@@ -13,6 +13,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
+import axios from "axios"
 
 const Data = [
   {
@@ -56,8 +57,20 @@ export default function Vegetables({ navigation }) {
     setVegetables(state);
   };
 
+  const fetchVegetables= async () =>{
+    try{
+      const response = await axios.get('/category/vegetables')
+      setVegetables(response.data)
+      console.log(response.data)
+    } catch (error){
+      console.log(error)
+    }
+    
+  }
+
   useEffect(() => {
-    setVegetables(Data);
+    // setVegetables(Data);
+    fetchVegetables()
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -98,8 +111,8 @@ export default function Vegetables({ navigation }) {
       {vegetables.map((item, itemIndex) => {
         const availableQuantity = item.availableQuantity.map((i, index) => {
           const newObj = new Object();
-          newObj.value = i;
-          newObj.label = i + item.unit;
+          newObj.value = i.value;
+          newObj.label = i.label + item.priceUnit;
           newObj.key = index;
           return newObj;
         });
@@ -160,7 +173,7 @@ export default function Vegetables({ navigation }) {
                         alignItems: "center",
                         height: 20,
                         backgroundColor:
-                          item.initialQuantity === quantity.value
+                          item.initialQuantity[0].value == quantity.value
                             ? theme.backgroundColor
                             : theme.lightgrey,
                         marginRight: Spacing.ExtraSmall,
@@ -171,7 +184,7 @@ export default function Vegetables({ navigation }) {
                       <Text
                         style={{
                           color:
-                            item.initialQuantity === quantity.value
+                            item.initialQuantity[0].value == quantity.value
                               ? "white"
                               : "black",
                           fontSize: Font.Small,

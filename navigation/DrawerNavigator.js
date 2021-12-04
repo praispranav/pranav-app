@@ -274,6 +274,54 @@ export default function App() {
       <Drawer.Screen
         options={({ navigation }) => {
           return {
+            title: "Tifin",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Tifin`}
+        component={FruitAndVegetables}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
             title: "News Paper",
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },

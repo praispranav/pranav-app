@@ -13,51 +13,75 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
+import axios from "axios"
 
-const Data = [
-  {
-    id: "1",
-    name: "The Times Of India",
-    image: require("../assets/img/vegetables.jpg"),
-    price: "100",
-    priceUnit: "month"
-  },
-  {
-    id: "2",
-    name: "The Hindu",
-    image: require("../assets/img/vegetables.jpg"),
-    price: "2000",
-    priceUnit: "year"
-  },
-  {
-    id: "3",
-    name: "Hindustan",
-    image: require("../assets/img/vegetables.jpg"),
+// const Data = [
+//   {
+//     id: "1",
+//     name: "The Times Of India",
+//     image: require("../assets/img/NewsPaper.jpg"),
+//     price: "100",
+//     priceUnit: "month"
+//   },
+//   {
+//     id: "2",
+//     name: "The Hindu",
+//     image: require("../assets/img/NewsPaper.jpg"),
+//     price: "2000",
+//     priceUnit: "year"
+//   },
+//   {
+//     id: "3",
+//     name: "Hindustan",
+//     image: require("../assets/img/NewsPaper.jpg"),
     
-    price: "1000",
-    priceUnit: "quarter"
-  },
-  {
-    id: "4",
-    name: "Economics Times",
-    image: require("../assets/img/vegetables.jpg"),
-    unit: "kg",
-    price: "1500",
-    priceUnit: " quarter"
-  },
-];
+//     price: "1000",
+//     priceUnit: "quarter"
+//   },
+//   {
+//     id: "4",
+//     name: "Economics Times",
+//     image: require("../assets/img/NewsPaper.jpg"),
+//     unit: "kg",
+//     price: "1500",
+//     priceUnit: " quarter"
+//   },
+// ];
 
-export default function Vegetables({ navigation }) {
-  const [vegetables, setVegetables] = useState([]);
+export default function NewsPaper({ navigation }) {
+  const [NewsPaper, setNewsPaper] = useState([]);
 
   const handleQuantityChange = (index, value) => {
-    const state = [...vegetables];
+    const state = [...NewsPaper];
     state[index].initialQuantity = value;
-    setVegetables(state);
+    setNewsPaper(state);
   };
 
+  const fetchImages = async (id) =>{
+    try{
+      const url = '/category/image/' + id
+      const response = await axios.get(url)
+      console.log(response.data)
+      // return response.data.image
+    } catch(error){
+      console.log(error)
+      return""
+    }
+  }
+
+  const fetchNewsPaper = async () =>{
+    try{
+      const response = await axios.get('/category/newspaper')
+      setNewsPaper(response.data)
+      console.log(response.data)
+    } catch (error){
+      console.log(error)
+    }
+    
+  }
+
   useEffect(() => {
-    setVegetables(Data);
+    fetchNewsPaper();
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -71,7 +95,7 @@ export default function Vegetables({ navigation }) {
         }}
       >
         <TextInput
-          placeholder="Search For Vegetables"
+          placeholder="Search For NewsPaper"
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,
@@ -95,7 +119,7 @@ export default function Vegetables({ navigation }) {
           <FontAwesome name="sort-amount-asc" size={15} color="white" />
         </TouchableOpacity>
       </View>
-      {vegetables.map((item, itemIndex) => {
+      {NewsPaper.map((item, itemIndex) => {
         return (
           <View
             style={{
@@ -116,7 +140,7 @@ export default function Vegetables({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+                <Text numberOfLines={1} style={{ width:'70%', fontSize: 18, fontFamily: "MPlusBold" }}>
                   {item.name}
                 </Text>
                 <TouchableOpacity

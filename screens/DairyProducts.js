@@ -14,6 +14,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
+import axios from 'axios'
 
 const Data = [
   {
@@ -51,17 +52,41 @@ const Data = [
   },
 ];
 
-export default function Vegetables({ navigation }) {
-  const [vegetables, setVegetables] = useState([]);
+export default function Dairy({ navigation }) {
+  const [Dairy, setDairy] = useState([]);
 
   const handleQuantityChange = (index, value) => {
-    const state = [...vegetables];
+    const state = [...Dairy];
     state[index].initialQuantity = value;
-    setVegetables(state);
+    setDairy(state);
   };
 
+  const fetchDairy = async () =>{
+    try{
+      const response = await axios.get('/category/dairy')
+      setDairy(response.data)
+      console.log(response.data)
+    } catch (error){
+      console.log(error)
+    }
+    
+  }
+  
+  const fetchImages = async (id) =>{
+    try{
+      const url = '/category/image/' + id
+      const response = await axios.get(url)
+      console.log(response.data)
+      // return response.data.image
+    } catch(error){
+      console.log(error)
+      return""
+    }
+  }
+
   useEffect(() => {
-    setVegetables(Data);
+    // setDairy(Data);
+    fetchDairy()
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -75,7 +100,7 @@ export default function Vegetables({ navigation }) {
         }}
       >
         <TextInput
-          placeholder="Search For Vegetables"
+          placeholder="Search For Dairy"
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,
@@ -99,11 +124,11 @@ export default function Vegetables({ navigation }) {
           <FontAwesome name="sort-amount-asc" size={15} color="white" />
         </TouchableOpacity>
       </View>
-      {vegetables.map((item, itemIndex) => {
+      {Dairy.map((item, itemIndex) => {
         const availableQuantity = item.availableQuantity.map((i, index) => {
           const newObj = new Object();
-          newObj.value = i;
-          newObj.label = i + " " + item.unit;
+          newObj.value = i.value;
+          newObj.label = i.label + " " + item.priceUnit;
           newObj.key = index;
           return newObj;
         });
@@ -127,7 +152,7 @@ export default function Vegetables({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+                <Text numberOfLines={1} style={{ fontSize: 18, width: '70%', fontFamily: "MPlusBold" }}>
                   {item.name}
                 </Text>
                 <TouchableOpacity
@@ -169,7 +194,7 @@ export default function Vegetables({ navigation }) {
                         alignItems: "center",
                         height: 20,
                         backgroundColor:
-                          item.initialQuantity === quantity.value
+                          item.initialQuantity[0].value === quantity.value
                             ? theme.backgroundColor
                             : theme.lightgrey,
                         marginRight: Spacing.ExtraSmall,
@@ -180,7 +205,7 @@ export default function Vegetables({ navigation }) {
                       <Text
                         style={{
                           color:
-                            item.initialQuantity === quantity.value
+                            item.initialQuantity[0].value === quantity.value
                               ? "white"
                               : "black",
                           fontSize: Font.Small,

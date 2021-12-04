@@ -14,54 +14,57 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
-import axios from "axios"
+import axios from 'axios'
 
-const Data = [
-  {
-    id: "1",
-    name: "Grapes",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1", "2", "3", "4", "5"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-  {
-    id: "2",
-    name: "Orange",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["4", "5"],
-    initialQuantity: "5",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-  {
-    id: "3",
-    name: "Apple",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1", "2", "10"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-];
+// const Data = [
+//   {
+//     id: "1",
+//     name: "Shuda Milk Full Cream",
+//     image: require("../assets/img/Tifin.jpg"),
+//     availableQuantity: ["1", "2", "3", "4", "5"],
+//     initialQuantity: "4",
+//     unit: "liters",
+//     price: "100",
+//     priceUnit: "liter",
+//     subscription: true,
+//   },
+//   {
+//     id: "2",
+//     name: "Shuda Cow Milk",
+//     image: require("../assets/img/Tifin.jpg"),
+//     availableQuantity: ["4", "5"],
+//     initialQuantity: "5",
+//     unit: "liters",
+//     price: "100",
+//     priceUnit: "liter",
+//     subscription: false,
+//   },
+//   {
+//     id: "3",
+//     name: "Amul Butter",
+//     image: require("../assets/img/Tifin.jpg"),
+//     availableQuantity: ["100", "200", "500"],
+//     initialQuantity: "200",
+//     unit: "gram",
+//     price: "100",
+//     subscription: false,
+//     priceUnit: "100 gram",
+//   },
+// ];
 
-export default function fruits({ navigation }) {
-  const [fruits, setfruits] = useState([]);
+export default function Tifin({ navigation }) {
+  const [Tifin, setTifin] = useState([]);
 
   const handleQuantityChange = (index, value) => {
-    const state = [...fruits];
+    const state = [...Tifin];
     state[index].initialQuantity = value;
-    setfruits(state);
+    setTifin(state);
   };
 
-  const fetchFruits= async () =>{
+  const fetchTifin = async () =>{
     try{
-      const response = await axios.get('/category/fruits')
-      setfruits(response.data)
+      const response = await axios.get('/category/flowers')
+      setTifin(response.data)
       console.log(response.data)
     } catch (error){
       console.log(error)
@@ -82,9 +85,9 @@ export default function fruits({ navigation }) {
   }
 
   useEffect(() => {
-    // setfruits(Data);
-    fetchImages("61ab76655ef8554db2cdb127")
-    fetchFruits()
+    // setTifin(Data);
+    fetchImages("61abaf63138b1e6787535e92")
+    fetchTifin()
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -98,7 +101,7 @@ export default function fruits({ navigation }) {
         }}
       >
         <TextInput
-          placeholder="Search For fruits"
+          placeholder="Search For Tifin"
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,
@@ -109,7 +112,6 @@ export default function fruits({ navigation }) {
           }}
         />
         <TouchableOpacity
-          onPress={() => navigation.navigate("LoginScreen")}
           style={{
             width: 35,
             height: 35,
@@ -123,11 +125,11 @@ export default function fruits({ navigation }) {
           <FontAwesome name="sort-amount-asc" size={15} color="white" />
         </TouchableOpacity>
       </View>
-      {fruits.map((item, itemIndex) => {
+      {Tifin.map((item, itemIndex) => {
         const availableQuantity = item.availableQuantity.map((i, index) => {
           const newObj = new Object();
           newObj.value = i.value;
-          newObj.label = i.label + item.priceUnit;
+          newObj.label = i.label + " " + item.priceUnit;
           newObj.key = index;
           return newObj;
         });
@@ -140,10 +142,9 @@ export default function fruits({ navigation }) {
             }}
           >
             <Image
-              source={{uri: "" }}
+              source={item.image}
               style={{ width: 70, height: 70, borderRadius: 5 }}
             />
-           
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
@@ -152,7 +153,7 @@ export default function fruits({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text numberOfLines={1} style={{ fontSize: 18,width: '70%', fontFamily: "MPlusBold" }}>
+                <Text numberOfLines={1} style={{ fontSize: 18, width: '70%', fontFamily: "MPlusBold" }}>
                   {item.name}
                 </Text>
                 <TouchableOpacity
@@ -216,38 +217,6 @@ export default function fruits({ navigation }) {
                     </TouchableOpacity>
                   )}
                 />
-                {/* {availableQuantity.map((quantity) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleQuantityChange(itemIndex, quantity.value)
-                    }
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: 30,
-                      height: 30,
-                      backgroundColor:
-                        item.initialQuantity === quantity.value
-                          ? theme.backgroundColor
-                          : theme.lightgrey,
-                      marginHorizontal: Spacing.ExtraSmall,
-                      borderRadius: 100,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color:
-                          item.initialQuantity === quantity.value
-                            ? "white"
-                            : "black",
-                        fontSize: Font.Small,
-                      }}
-                    >
-                      {quantity.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))} */}
               </View>
             </View>
           </View>
