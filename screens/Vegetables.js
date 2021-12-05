@@ -15,7 +15,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
 import axios from "axios";
-import FontText from "../elements/Text"
+import FontText from "../elements/Text";
 
 const Data = [
   {
@@ -64,8 +64,7 @@ export default function Vegetables({ navigation }) {
     try {
       const response = await axios.get("/category/vegetables");
       setVegetables(response.data);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const fetchImages = async (id) => {
@@ -76,8 +75,7 @@ export default function Vegetables({ navigation }) {
         setImageState(response.data.data);
       } else {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const findImage = (id) => {
@@ -144,130 +142,108 @@ export default function Vegetables({ navigation }) {
         });
         return (
           <>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              marginVertical: Spacing.Large,
-            }}
-          >
-            {findImage(item._id) ? (
-              <Image
-                source={{ uri: findImage(item._id) }}
-                style={{ width: 70, height: 70, borderRadius: 5 }}
-              />
-            ) : (
-              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
-            )}
-            {/* {findImage(item._id)} */}
-            <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                  {item.name}
-                </Text>
-                <TouchableOpacity
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                marginVertical: Spacing.Large,
+              }}
+            >
+              {findImage(item._id) ? (
+                <Image
+                  source={{ uri: findImage(item._id) }}
+                  style={{ width: 70, height: 70, borderRadius: 5 }}
+                />
+              ) : (
+                <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+              )}
+              {/* {findImage(item._id)} */}
+              <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
+                <View
                   style={{
-                    borderRadius: 5,
-                    backgroundColor: theme.backgroundColor,
-                    paddingHorizontal: Spacing.ExtraLarge,
-                    paddingVertical: Spacing.ExtraSmall,
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Text style={{ color: "white" }}>Add</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{ display: "flex", flexDirection: "row" }}>
-                <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
-                  ₹ {item.price}/{item.priceUnit}
-                </Text>
-              </View>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  marginTop: Spacing.Small,
-                }}
-              >
-                <FlatList
-                  data={availableQuantity}
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(item) => item.key}
-                  renderItem={({ item: quantity }) => (
+                  <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+                    {item.name}
+                  </Text>
+                  {item.status.toLowerCase() === "available" ? (
                     <TouchableOpacity
-                      onPress={() =>
-                        handleQuantityChange(itemIndex, quantity.value)
-                      }
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: 20,
-                        backgroundColor:
-                          item.initialQuantity[0].value == quantity.value
-                            ? theme.backgroundColor
-                            : theme.lightgrey,
-                        marginRight: Spacing.ExtraSmall,
-                        borderRadius: 100,
-                        paddingHorizontal: Spacing.Small,
+                        borderRadius: 5,
+                        backgroundColor: theme.backgroundColor,
+                        paddingHorizontal: Spacing.ExtraLarge,
+                        paddingVertical: Spacing.ExtraSmall,
                       }}
                     >
-                      <Text
+                      <Text style={{ color: "white" }}>Add</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={{ display: "flex", position: 'absolute', right: 0, alignItems:"center", top: 10 }}>
+                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.Primary }}>Out</FontText>
+                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.ExtraSmall }}>Of</FontText>
+                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.Primary }}>Stock</FontText>
+                    </View>
+                  )}
+                </View>
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <Text
+                    style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}
+                  >
+                    ₹ {item.price}/{item.priceUnit}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: Spacing.Small,
+                  }}
+                >
+                  <FlatList
+                    data={availableQuantity}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item) => item.key}
+                    renderItem={({ item: quantity }) => (
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleQuantityChange(itemIndex, quantity.value)
+                        }
                         style={{
-                          color:
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: 20,
+                          backgroundColor:
                             item.initialQuantity[0].value == quantity.value
-                              ? "white"
-                              : "black",
-                          fontSize: Font.Small,
+                              ? theme.backgroundColor
+                              : theme.lightgrey,
+                          marginRight: Spacing.ExtraSmall,
+                          borderRadius: 100,
+                          paddingHorizontal: Spacing.Small,
                         }}
                       >
-                        {quantity.label}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                />
-                {/* {availableQuantity.map((quantity) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      handleQuantityChange(itemIndex, quantity.value)
-                    }
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: 30,
-                      height: 30,
-                      backgroundColor:
-                        item.initialQuantity === quantity.value
-                          ? theme.backgroundColor
-                          : theme.lightgrey,
-                      marginHorizontal: Spacing.ExtraSmall,
-                      borderRadius: 100,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color:
-                          item.initialQuantity === quantity.value
-                            ? "white"
-                            : "black",
-                        fontSize: Font.Small,
-                      }}
-                    >
-                      {quantity.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))} */}
+                        <Text
+                          style={{
+                            color:
+                              item.initialQuantity[0].value == quantity.value
+                                ? "white"
+                                : "black",
+                            fontSize: Font.Small,
+                          }}
+                        >
+                          {quantity.label}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                </View>
               </View>
             </View>
-          </View>
-          <FontText style={{ marginBottom: 15 }}>{item.description}</FontText>
+            <FontText style={{ marginBottom: 15 }}>{item.description}</FontText>
           </>
         );
       })}

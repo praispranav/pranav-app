@@ -183,16 +183,24 @@ export default function fruits({ navigation }) {
                 >
                   {item.name}
                 </Text>
-                <TouchableOpacity
-                  style={{
-                    borderRadius: 5,
-                    backgroundColor: theme.backgroundColor,
-                    paddingHorizontal: Spacing.ExtraLarge,
-                    paddingVertical: Spacing.ExtraSmall,
-                  }}
-                >
-                  <Text style={{ color: "white" }}>Add</Text>
-                </TouchableOpacity>
+                {item.status.toLowerCase() === "available" ? (
+                    <TouchableOpacity
+                      style={{
+                        borderRadius: 5,
+                        backgroundColor: theme.backgroundColor,
+                        paddingHorizontal: Spacing.ExtraLarge,
+                        paddingVertical: Spacing.ExtraSmall,
+                      }}
+                    >
+                      <Text style={{ color: "white" }}>Add</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View style={{ display: "flex", position: 'absolute', right: 0, alignItems:"center", top: 10 }}>
+                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.Primary }}>Out</FontText>
+                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.ExtraSmall }}>Of</FontText>
+                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.Primary }}>Stock</FontText>
+                    </View>
+                  )}
               </View>
               <View style={{ display: "flex", flexDirection: "row" }}>
                 <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
