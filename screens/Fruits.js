@@ -14,7 +14,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
-import axios from "axios"
+import axios from "axios";
 
 const Data = [
   {
@@ -51,6 +51,7 @@ const Data = [
 
 export default function fruits({ navigation }) {
   const [fruits, setfruits] = useState([]);
+  const [imageState, setImageState] = useState([]);
 
   const handleQuantityChange = (index, value) => {
     const state = [...fruits];
@@ -58,33 +59,43 @@ export default function fruits({ navigation }) {
     setfruits(state);
   };
 
-  const fetchFruits= async () =>{
-    try{
-      const response = await axios.get('/category/fruits')
-      setfruits(response.data)
-      console.log(response.data)
-    } catch (error){
-      console.log(error)
+  const fetchFruits = async () => {
+    try {
+      const response = await axios.get("/category/fruits");
+      setfruits(response.data);
+    } catch (error) {
     }
-    
-  }
-  
-  const fetchImages = async (id) =>{
-    try{
-      const url = '/category/image/' + id
-      const response = await axios.get(url)
-      console.log(response.data)
-      // return response.data.image
-    } catch(error){
-      console.log(error)
-      return""
+  };
+
+  const fetchImages = async (id) => {
+    console.warn(id);
+    try {
+      const response = await axios.get(`/category/image/fruits`);
+      if (response.data) {
+        setImageState(response.data.data);
+      } else {
+      }
+    } catch (error) {
     }
-  }
+  };
+
+  const findImage = (id) => {
+    let item1 = "";
+    imageState.find((item) => {
+      if (item.productId == id) {
+        item1 = item.image;
+      }
+    });
+    if (item1) {
+      return item1;
+    }
+    return false;
+  };
 
   useEffect(() => {
     // setfruits(Data);
-    fetchImages("61ab76655ef8554db2cdb127")
-    fetchFruits()
+    fetchImages("61ab76655ef8554db2cdb127");
+    fetchFruits();
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -139,11 +150,19 @@ export default function fruits({ navigation }) {
               marginVertical: Spacing.Large,
             }}
           >
-            <Image
+            {/* <Image
               source={{uri: "" }}
               style={{ width: 70, height: 70, borderRadius: 5 }}
-            />
-           
+            /> */}
+            {findImage(item._id) ? (
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            ) : (
+              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+            )}
+
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
@@ -152,7 +171,14 @@ export default function fruits({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text numberOfLines={1} style={{ fontSize: 18,width: '70%', fontFamily: "MPlusBold" }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 18,
+                    width: "70%",
+                    fontFamily: "MPlusBold",
+                  }}
+                >
                   {item.name}
                 </Text>
                 <TouchableOpacity

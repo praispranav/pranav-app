@@ -13,7 +13,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
-import axios from "axios"
+import axios from "axios";
 
 // const Data = [
 //   {
@@ -34,7 +34,7 @@ import axios from "axios"
 //     id: "3",
 //     name: "Hindustan",
 //     image: require("../assets/img/NewsPaper.jpg"),
-    
+
 //     price: "1000",
 //     priceUnit: "quarter"
 //   },
@@ -50,6 +50,7 @@ import axios from "axios"
 
 export default function NewsPaper({ navigation }) {
   const [NewsPaper, setNewsPaper] = useState([]);
+  const [imageState, setImageState] = useState([]);
 
   const handleQuantityChange = (index, value) => {
     const state = [...NewsPaper];
@@ -57,31 +58,43 @@ export default function NewsPaper({ navigation }) {
     setNewsPaper(state);
   };
 
-  const fetchImages = async (id) =>{
-    try{
-      const url = '/category/image/' + id
-      const response = await axios.get(url)
-      console.log(response.data)
-      // return response.data.image
-    } catch(error){
-      console.log(error)
-      return""
+  const fetchNewsPaper = async () => {
+    try {
+      const response = await axios.get("/category/newspaper");
+      setNewsPaper(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
 
-  const fetchNewsPaper = async () =>{
-    try{
-      const response = await axios.get('/category/newspaper')
-      setNewsPaper(response.data)
-      console.log(response.data)
-    } catch (error){
-      console.log(error)
+  const fetchImages = async (id) => {
+    console.warn(id);
+    try {
+      const response = await axios.get(`/category/image/newspaper`);
+      if (response.data) {
+        setImageState(response.data.data);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const findImage = (id) => {
+    let item1 = "";
+    imageState.find((item) => {
+      if (item.productId == id) {
+        item1 = item.image;
+      }
+    });
+    if (item1) {
+      return item1;
     }
-    
-  }
+    return false;
+  };
 
   useEffect(() => {
     fetchNewsPaper();
+    fetchImages();
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -128,10 +141,14 @@ export default function NewsPaper({ navigation }) {
               marginVertical: Spacing.Large,
             }}
           >
-            <Image
-              source={item.image}
-              style={{ width: 70, height: 70, borderRadius: 5 }}
-            />
+            {findImage(item._id) ? (
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            ) : (
+              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+            )}
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
@@ -140,7 +157,14 @@ export default function NewsPaper({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text numberOfLines={1} style={{ width:'70%', fontSize: 18, fontFamily: "MPlusBold" }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    width: "70%",
+                    fontSize: 18,
+                    fontFamily: "MPlusBold",
+                  }}
+                >
                   {item.name}
                 </Text>
                 <TouchableOpacity

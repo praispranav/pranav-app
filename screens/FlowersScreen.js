@@ -14,13 +14,13 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
-import axios from 'axios'
+import axios from "axios";
 
 // const Data = [
 //   {
 //     id: "1",
 //     name: "Shuda Milk Full Cream",
-//     image: require("../assets/img/Tifin.jpg"),
+//     image: require("../assets/img/Flowers.jpg"),
 //     availableQuantity: ["1", "2", "3", "4", "5"],
 //     initialQuantity: "4",
 //     unit: "liters",
@@ -31,7 +31,7 @@ import axios from 'axios'
 //   {
 //     id: "2",
 //     name: "Shuda Cow Milk",
-//     image: require("../assets/img/Tifin.jpg"),
+//     image: require("../assets/img/Flowers.jpg"),
 //     availableQuantity: ["4", "5"],
 //     initialQuantity: "5",
 //     unit: "liters",
@@ -42,7 +42,7 @@ import axios from 'axios'
 //   {
 //     id: "3",
 //     name: "Amul Butter",
-//     image: require("../assets/img/Tifin.jpg"),
+//     image: require("../assets/img/Flowers.jpg"),
 //     availableQuantity: ["100", "200", "500"],
 //     initialQuantity: "200",
 //     unit: "gram",
@@ -52,42 +52,54 @@ import axios from 'axios'
 //   },
 // ];
 
-export default function Tifin({ navigation }) {
-  const [Tifin, setTifin] = useState([]);
+export default function Flowers({ navigation }) {
+  const [Flowers, setFlowers] = useState([]);
+  const [imageState, setImageState] = useState([]);
 
   const handleQuantityChange = (index, value) => {
-    const state = [...Tifin];
+    const state = [...Flowers];
     state[index].initialQuantity = value;
-    setTifin(state);
+    setFlowers(state);
   };
 
-  const fetchTifin = async () =>{
-    try{
-      const response = await axios.get('/category/flowers')
-      setTifin(response.data)
-      console.log(response.data)
-    } catch (error){
-      console.log(error)
+  const fetchFlowers = async () => {
+    try {
+      const response = await axios.get("/category/flowers");
+      setFlowers(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
     }
-    
-  }
-  
-  const fetchImages = async (id) =>{
-    try{
-      const url = '/category/image/' + id
-      const response = await axios.get(url)
-      console.log(response.data)
-      // return response.data.image
-    } catch(error){
-      console.log(error)
-      return""
+  };
+
+  const fetchImages = async (id) => {
+    console.warn(id);
+    try {
+      const response = await axios.get(`/category/image/flowers`);
+      if (response.data) {
+        setImageState(response.data.data);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const findImage = (id) => {
+    let item1 = "";
+    imageState.find((item) => {
+      if (item.productId == id) {
+        item1 = item.image;
+      }
+    });
+    if (item1) {
+      return item1;
     }
-  }
+    return false;
+  };
 
   useEffect(() => {
-    // setTifin(Data);
-    fetchImages("61abaf63138b1e6787535e92")
-    fetchTifin()
+    // setFlowers(Data);
+    fetchFlowers();
+    fetchImages();
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -101,7 +113,7 @@ export default function Tifin({ navigation }) {
         }}
       >
         <TextInput
-          placeholder="Search For Tifin"
+          placeholder="Search For Flowers"
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,
@@ -125,7 +137,7 @@ export default function Tifin({ navigation }) {
           <FontAwesome name="sort-amount-asc" size={15} color="white" />
         </TouchableOpacity>
       </View>
-      {Tifin.map((item, itemIndex) => {
+      {Flowers.map((item, itemIndex) => {
         const availableQuantity = item.availableQuantity.map((i, index) => {
           const newObj = new Object();
           newObj.value = i.value;
@@ -141,10 +153,14 @@ export default function Tifin({ navigation }) {
               marginVertical: Spacing.Large,
             }}
           >
-            <Image
-              source={item.image}
-              style={{ width: 70, height: 70, borderRadius: 5 }}
-            />
+            {findImage(item._id) ? (
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            ) : (
+              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+            )}
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
@@ -153,7 +169,14 @@ export default function Tifin({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text numberOfLines={1} style={{ fontSize: 18, width: '70%', fontFamily: "MPlusBold" }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 18,
+                    width: "70%",
+                    fontFamily: "MPlusBold",
+                  }}
+                >
                   {item.name}
                 </Text>
                 <TouchableOpacity

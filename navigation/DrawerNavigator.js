@@ -117,6 +117,8 @@ import NewsPaperScreen from "../screens/NewsPaper";
 import DairyProducts from "../screens/DairyProducts";
 import CartScreen from "../screens/CartScreen";
 import OrderHistory from "./OrderHistory";
+import Tifin from "../screens/TifinScreen";
+import Flowers from "../screens/FlowersScreen";
 
 function NotificationsScreen({ navigation }) {
   return (
@@ -317,7 +319,55 @@ export default function App() {
           };
         }}
         name={`Tifin`}
-        component={FruitAndVegetables}
+        component={Tifin}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Flowers",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate("LoginScreen")}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Flowers`}
+        component={Flowers}
       />
       <Drawer.Screen
         options={({ navigation }) => {

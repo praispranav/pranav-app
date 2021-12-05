@@ -5,7 +5,8 @@ import {
   Image,
   TextInput,
   ScrollView,
-  TouchableOpacity,FlatList
+  TouchableOpacity,
+  FlatList,
 } from "react-native";
 import theme from "../config/theme";
 import { Spacing } from "../constants/MarginPadding";
@@ -13,7 +14,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
-import axios from "axios"
+import axios from "axios";
 
 const Data = [
   {
@@ -24,7 +25,7 @@ const Data = [
     initialQuantity: "4",
     unit: "kg",
     price: "10",
-    priceUnit:"kg"
+    priceUnit: "kg",
   },
   {
     id: "2",
@@ -34,22 +35,23 @@ const Data = [
     initialQuantity: "5",
     unit: "kg",
     price: "100",
-    priceUnit:"kg"
+    priceUnit: "kg",
   },
   {
     id: "3",
     name: "Cabbage",
     image: require("../assets/img/vegetables.jpg"),
-    availableQuantity: ["1", "2","10"],
+    availableQuantity: ["1", "2", "10"],
     initialQuantity: "1",
     unit: "kg",
     price: "100",
-    priceUnit: "kg"
+    priceUnit: "kg",
   },
 ];
 
 export default function Vegetables({ navigation }) {
   const [vegetables, setVegetables] = useState([]);
+  const [imageState, setImageState] = useState([]);
 
   const handleQuantityChange = (index, value) => {
     const state = [...vegetables];
@@ -57,20 +59,43 @@ export default function Vegetables({ navigation }) {
     setVegetables(state);
   };
 
-  const fetchVegetables= async () =>{
-    try{
-      const response = await axios.get('/category/vegetables')
-      setVegetables(response.data)
-      console.log(response.data)
-    } catch (error){
-      console.log(error)
+  const fetchVegetables = async () => {
+    try {
+      const response = await axios.get("/category/vegetables");
+      setVegetables(response.data);
+    } catch (error) {
     }
-    
-  }
+  };
+
+  const fetchImages = async (id) => {
+    console.warn(id);
+    try {
+      const response = await axios.get(`/category/image/vegetables`);
+      if (response.data) {
+        setImageState(response.data.data);
+      } else {
+      }
+    } catch (error) {
+    }
+  };
+
+  const findImage = (id) => {
+    let item1 = "";
+    imageState.find((item) => {
+      if (item.productId == id) {
+        item1 = item.image;
+      }
+    });
+    if (item1) {
+      return item1;
+    }
+    return false;
+  };
 
   useEffect(() => {
     // setVegetables(Data);
-    fetchVegetables()
+    fetchVegetables();
+    fetchImages();
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -117,18 +142,28 @@ export default function Vegetables({ navigation }) {
           return newObj;
         });
         return (
-          <View style={{ display: "flex", flexDirection: "row", marginVertical: Spacing.Large }}>
-            <Image
-              source={item.image}
-              style={{ width: 70, height: 70, borderRadius: 5 }}
-            />
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginVertical: Spacing.Large,
+            }}
+          >
+            {findImage(item._id) ? (
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            ) : (
+              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+            )}
+            {/* {findImage(item._id)} */}
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
                   display: "flex",
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  
                 }}
               >
                 <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
@@ -154,7 +189,7 @@ export default function Vegetables({ navigation }) {
                 style={{
                   display: "flex",
                   flexDirection: "row",
-                  marginTop:Spacing.Small
+                  marginTop: Spacing.Small,
                 }}
               >
                 <FlatList

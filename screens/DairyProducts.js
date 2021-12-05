@@ -14,7 +14,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
-import axios from 'axios'
+import axios from "axios";
 
 const Data = [
   {
@@ -54,6 +54,7 @@ const Data = [
 
 export default function Dairy({ navigation }) {
   const [Dairy, setDairy] = useState([]);
+  const [imageState, setImageState] = useState([]);
 
   const handleQuantityChange = (index, value) => {
     const state = [...Dairy];
@@ -61,32 +62,44 @@ export default function Dairy({ navigation }) {
     setDairy(state);
   };
 
-  const fetchDairy = async () =>{
-    try{
-      const response = await axios.get('/category/dairy')
-      setDairy(response.data)
-      console.log(response.data)
-    } catch (error){
-      console.log(error)
+  const fetchDairy = async () => {
+    try {
+      const response = await axios.get("/category/dairy");
+      setDairy(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
     }
-    
-  }
-  
-  const fetchImages = async (id) =>{
-    try{
-      const url = '/category/image/' + id
-      const response = await axios.get(url)
-      console.log(response.data)
-      // return response.data.image
-    } catch(error){
-      console.log(error)
-      return""
+  };
+
+  const fetchImages = async (id) => {
+    console.warn(id);
+    try {
+      const response = await axios.get(`/category/image/dairy`);
+      if (response.data) {
+        setImageState(response.data.data);
+      } else {
+      }
+    } catch (error) {}
+  };
+
+  const findImage = (id) => {
+    let item1 = "";
+    imageState.find((item) => {
+      if (item.productId == id) {
+        item1 = item.image;
+      }
+    });
+    if (item1) {
+      return item1;
     }
-  }
+    return false;
+  };
 
   useEffect(() => {
     // setDairy(Data);
-    fetchDairy()
+    fetchDairy();
+    fetchImages();
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -140,10 +153,14 @@ export default function Dairy({ navigation }) {
               marginVertical: Spacing.Large,
             }}
           >
-            <Image
-              source={item.image}
-              style={{ width: 70, height: 70, borderRadius: 5 }}
-            />
+            {findImage(item._id) ? (
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            ) : (
+              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+            )}
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
@@ -152,7 +169,14 @@ export default function Dairy({ navigation }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text numberOfLines={1} style={{ fontSize: 18, width: '70%', fontFamily: "MPlusBold" }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    fontSize: 18,
+                    width: "70%",
+                    fontFamily: "MPlusBold",
+                  }}
+                >
                   {item.name}
                 </Text>
                 <TouchableOpacity
