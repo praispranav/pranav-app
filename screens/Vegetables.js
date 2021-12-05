@@ -15,6 +15,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
 import axios from "axios";
+import FontText from "../elements/Text"
 
 const Data = [
   {
@@ -142,6 +143,7 @@ export default function Vegetables({ navigation }) {
           return newObj;
         });
         return (
+          <>
           <View
             style={{
               display: "flex",
@@ -265,6 +267,8 @@ export default function Vegetables({ navigation }) {
               </View>
             </View>
           </View>
+          <FontText style={{ marginBottom: 15 }}>{item.description}</FontText>
+          </>
         );
       })}
     </ScrollView>

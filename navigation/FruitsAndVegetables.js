@@ -8,7 +8,7 @@ const Tab = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
   return (
-    <Tab.Navigator screenOptions={{ tabBarActiveTintColor: theme.backgroundColor, tabBarIndicatorStyle:{ backgroundColor: theme.backgroundColor} }}>
+    <Tab.Navigator  screenOptions={{ lazy:true, tabBarActiveTintColor: theme.backgroundColor, tabBarIndicatorStyle:{ backgroundColor: theme.backgroundColor} }}>
       <Tab.Screen name="Fruits" component={Fruits} />
       <Tab.Screen name="Vegetables" component={Vegetables} />
     </Tab.Navigator>

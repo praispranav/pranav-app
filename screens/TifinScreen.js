@@ -15,6 +15,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
 import axios from 'axios'
+import FontText from "../elements/Text"
 
 // const Data = [
 //   {
@@ -54,6 +55,8 @@ import axios from 'axios'
 
 export default function Tifin({ navigation }) {
   const [Tifin, setTifin] = useState([]);
+  const [imageState, setImageState] = useState([]);
+
 
   const handleQuantityChange = (index, value) => {
     const state = [...Tifin];
@@ -72,21 +75,35 @@ export default function Tifin({ navigation }) {
     
   }
   
-  const fetchImages = async (id) =>{
-    try{
-      const url = '/category/image/' + id
-      const response = await axios.get(url)
-      console.log(response.data)
-      // return response.data.image
-    } catch(error){
-      console.log(error)
-      return""
+  const fetchImages = async (id) => {
+    console.warn(id);
+    try {
+      const response = await axios.get(`/category/image/tifin`);
+      if (response.data) {
+        setImageState(response.data.data);
+      } else {
+      }
+    } catch (error) {
     }
-  }
+  };
+
+  const findImage = (id) => {
+    let item1 = "";
+    imageState.find((item) => {
+      if (item.productId == id) {
+        item1 = item.image;
+      }
+    });
+    if (item1) {
+      return item1;
+    }
+    return false;
+  };
 
   useEffect(() => {
     // setTifin(Data);
     fetchTifin()
+    fetchImages()
   }, []);
   return (
     <ScrollView style={styles.screen}>
@@ -133,6 +150,7 @@ export default function Tifin({ navigation }) {
           return newObj;
         });
         return (
+          <>
           <View
             style={{
               display: "flex",
@@ -140,10 +158,14 @@ export default function Tifin({ navigation }) {
               marginVertical: Spacing.Large,
             }}
           >
-            <Image
-              source={item.image}
-              style={{ width: 70, height: 70, borderRadius: 5 }}
-            />
+           {findImage(item._id) ? (
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            ) : (
+              <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+            )}
             <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
               <View
                 style={{
@@ -219,6 +241,8 @@ export default function Tifin({ navigation }) {
               </View>
             </View>
           </View>
+          <FontText style={{ marginBottom: 15 }}>{item.description}</FontText>
+          </>
         );
       })}
     </ScrollView>
