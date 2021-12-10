@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Image,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import theme from "../config/theme";
 import { Font } from "../constants/Fonts";
 import TextFont from "../elements/Text";
 import { Spacing } from "../constants/MarginPadding";
 import moment from "moment";
+import axios from "axios";
+import { useHistory } from "../hooks/useHistory";
+import Loading from "../components/Loading";
 
 const styles = StyleSheet.create({
   screen: {
@@ -40,6 +46,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: Spacing.ExtraSmall,
     alignItems: "center",
+    maxWidth: 80,
   },
   blueBadge2: {
     borderRadius: 20,
@@ -75,6 +82,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: Spacing.ExtraSmall,
   },
+  cancelled: {
+    borderRadius: 20,
+    height: 20,
+    width: 75,
+    paddingHorizontal: Spacing.Medium,
+    backgroundColor: theme.redMedium,
+    display: "flex",
+    justifyContent: "center",
+    marginTop: Spacing.ExtraSmall,
+  },
   greenBadge: {
     borderRadius: 20,
     height: 20,
@@ -101,58 +118,110 @@ const styles = StyleSheet.create({
   },
 });
 
-const data = [
-  {
-    id: "1",
-    name: "Grapes",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Processing",
-    orderDate: new Date(),
-  },
-  {
-    id: "2",
-    name: "Orange",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["5"],
-    initialQuantity: "5",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Confirmed",
-    orderDate: new Date(),
-  },
-  {
-    id: "3",
-    name: "Apple",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["10"],
-    initialQuantity: "10",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Delivered",
-    orderDate: new Date(),
-  },
-  {
-    id: "4",
-    name: "Milk",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["10"],
-    initialQuantity: "10",
-    unit: "liter",
-    price: "100",
-    priceUnit: "liter",
-    status: "Rejected",
-    orderDate: new Date(),
-  },
-];
+const Item = ({ item, getBadgeColor, getBackgroundColor }) => {
+  const [imageState, setImageState] = useState(false);
+  const [fetch, state, loading] = useHistory();
+
+  const getImage = async () => {
+    console.log(item.productId);
+    if (imageState) return;
+    try {
+      const responseawait = await axios.get(
+        `/category/image/id/${item.productId}`
+      );
+      setImageState(responseawait.data[0].image);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getImage();
+  }, []);
+  return (
+    <View
+      style={[
+        styles.mainContainer,
+        { backgroundColor: getBackgroundColor(item.status) },
+      ]}
+    >
+      <View style={{ position: "relative" }}>
+        {imageState ? (
+          <Image
+            source={{ uri: imageState }}
+            style={{ width: 70, height: 70, borderRadius: 5 }}
+          />
+        ) : (
+          <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+        )}
+      </View>
+      <View style={styles.childContainer}>
+        <View>
+          <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+            {item.name}
+          </Text>
+          <View style={getBadgeColor(item.status)}>
+            <Text style={styles.statusStyle}>{item.status}</Text>
+          </View>
+          <Text
+            style={{
+              color: "black",
+              fontSize: Font.Small,
+              marginTop: Spacing.ExtraSmall,
+            }}
+          >
+            {item.selectedQuantity + " " + item.priceUnit} --{" "}
+            {moment(item.createdDate).format("YYYY-MM-DD")}
+          </Text>
+        </View>
+        <View
+          style={{
+            alignSelf: "flex-end",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>Total</Text>
+          <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}> Amount</Text>
+          <Text>{item.price * item.selectedQuantity}</Text>
+          {item.status.toLowerCase() === "processing" && (
+            <TouchableOpacity
+              onPress={() => fetch({ type: false, body: { id: item._id } })}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: 20,
+                backgroundColor: theme.redLight,
+                marginRight: Spacing.ExtraSmall,
+                borderRadius: 100,
+                paddingHorizontal: Spacing.Small,
+              }}
+            >
+              <Text
+                style={{
+                  color: "black",
+                  fontSize: Font.Small,
+                }}
+              >
+                {loading ? <ActivityIndicator color="red" /> : "Delete"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        {/* <Text>
+                  Order Date: {moment(item.orderDate).format("YYYY/MM/DD")}
+                </Text> */}
+        {/* <View style={styles.blueBadge2}>
+                </View> */}
+      </View>
+    </View>
+  );
+};
 
 export default function ProductHistory({ navigation }) {
+  const [http, state, loading] = useHistory();
+
   const getBackgroundColor = (status) => {
     if (status.toLowerCase() === "delivered") return theme.lightgrey;
     if (status.toLowerCase() === "rejected") return theme.redLight;
@@ -165,69 +234,28 @@ export default function ProductHistory({ navigation }) {
     if (status.toLowerCase() === "rejected") return styles.redBadge;
     if (status.toLowerCase() === "processing") return styles.blueBadge;
     if (status.toLowerCase() === "confirmed") return styles.greenBadge;
+    if (status.toLowerCase() === "cancelled") return styles.cancelled;
   };
+  useEffect(() => {
+    const unsub = navigation.addListener("focus", async () => {
+      http({ type: "fetch", body: "" });
+    });
+    return unsub;
+  }, [navigation]);
+  if (loading) return <Loading />;
   return (
-    <View style={styles.screen}>
-      {data.map(( item ) => {
+    <ScrollView style={styles.screen}>
+      {state
+        .sort((a, b) => b.createdDate.localeCompare(a.createdDate))
+        .map((item) => {
           return (
-            <View
-              style={[
-                styles.mainContainer,
-                { backgroundColor: getBackgroundColor(item.status) },
-              ]}
-            >
-              <View style={{ position: "relative" }}>
-                <Image
-                  source={item.image}
-                  style={{ borderRadius: 5, width: 70, height: 70 }}
-                />
-                <View style={styles.whiteBadge}>
-                  <Text>{item.id}</Text>
-                </View>
-              </View>
-              <View style={styles.childContainer}>
-                <View>
-                  <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                    {item.name}
-                  </Text>
-                  <View style={getBadgeColor(item.status)}>
-                    <Text style={styles.statusStyle}>{item.status}</Text>
-                  </View>
-                  <Text
-                    style={{
-                      color: "black",
-                      fontSize: Font.Small,
-                      marginTop: Spacing.ExtraSmall,
-                    }}
-                  >
-                    {item.availableQuantity[0] + " " + item.unit} -- {moment(item.orderDate).format('YYYY-MM-DD')}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    alignSelf: "flex-end",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>
-                    Total
-                  </Text>
-                  <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}>
-                    {" "}
-                    Amount
-                  </Text>
-                  <Text>{item.price}</Text>
-                </View>
-                {/* <Text>
-                  Order Date: {moment(item.orderDate).format("YYYY/MM/DD")}
-                </Text> */}
-                {/* <View style={styles.blueBadge2}>
-                </View> */}
-              </View>
-            </View>
-          )})
-        }
-    </View>
+            <Item
+              item={item}
+              getBadgeColor={getBadgeColor}
+              getBackgroundColor={getBackgroundColor}
+            />
+          );
+        })}
+    </ScrollView>
   );
 }

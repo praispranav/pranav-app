@@ -16,6 +16,7 @@
     "axios": "^0.24.0",
     "expo": "~43.0.2",
     "expo-font": "~10.0.3",
+    "expo-secure-store": "^11.0.3",
     "expo-status-bar": "~1.1.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",

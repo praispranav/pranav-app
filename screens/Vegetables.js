@@ -5,6 +5,7 @@ import {
   Image,
   TextInput,
   ScrollView,
+  ActivityIndicator,
   TouchableOpacity,
   FlatList,
 } from "react-native";
@@ -16,6 +17,7 @@ import Text from "../elements/Text";
 import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
+import { useAddCart } from "../hooks/useAddCart";
 
 const Data = [
   {
@@ -50,15 +52,169 @@ const Data = [
   },
 ];
 
+const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
+  const [selectedQuantity, setSelectedQuantity] = useState({
+    label: "",
+    value: "0",
+  });
+  const [addItemToCart, loading] = useAddCart();
+  useEffect(() => {
+    setSelectedQuantity(item.initialQuantity);
+    console.warn(item.initialQuantity);
+  }, [item]);
+  return (
+    <>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          marginVertical: Spacing.Large,
+        }}
+      >
+        {findImage(item._id) ? (
+          <Image
+            source={{ uri: findImage(item._id) }}
+            style={{ width: 70, height: 70, borderRadius: 5 }}
+          />
+        ) : (
+          <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+        )}
+        {/* {findImage(item._id)} */}
+        <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+              {item.name}
+            </Text>
+            {item.status.toLowerCase() === "available" ? (
+              <TouchableOpacity
+                onPress={() => addItemToCart(item._id, selectedQuantity.value)}
+                style={{
+                  borderRadius: 5,
+                  backgroundColor: theme.backgroundColor,
+                  paddingHorizontal: Spacing.ExtraLarge,
+                  paddingVertical: Spacing.ExtraSmall,
+                }}
+              >
+                <Text style={{ color: "white" }}>
+                  {loading ? <ActivityIndicator color="white" /> : "Add"}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  right: 0,
+                  alignItems: "center",
+                  top: 10,
+                }}
+              >
+                <FontText
+                  style={{
+                    color: "red",
+                    fontWeight: "bold",
+                    fontSize: Font.Primary,
+                  }}
+                >
+                  Out
+                </FontText>
+                <FontText
+                  style={{
+                    color: "red",
+                    fontWeight: "bold",
+                    fontSize: Font.ExtraSmall,
+                  }}
+                >
+                  Of
+                </FontText>
+                <FontText
+                  style={{
+                    color: "red",
+                    fontWeight: "bold",
+                    fontSize: Font.Primary,
+                  }}
+                >
+                  Stock
+                </FontText>
+              </View>
+            )}
+          </View>
+          <View style={{ display: "flex", flexDirection: "row" }}>
+            <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
+              ₹ {discountedPrice}/{item.priceUnit}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "MPlusBold",
+                fontSize: Font.Small,
+                textDecorationLine: "line-through",
+                color: "grey",
+                marginLeft: Spacing.Normal,
+              }}
+            >
+              ₹ {item.price}/{item.priceUnit}
+            </Text>
+          </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginTop: Spacing.Small,
+            }}
+          >
+            <FlatList
+              data={availableQuantity}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.key}
+              renderItem={({ item: quantity }) => (
+                <TouchableOpacity
+                  onPress={() => setSelectedQuantity(quantity)}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: 20,
+                    backgroundColor:
+                      selectedQuantity.value == quantity.value
+                        ? theme.backgroundColor
+                        : theme.lightgrey,
+                    marginRight: Spacing.ExtraSmall,
+                    borderRadius: 100,
+                    paddingHorizontal: Spacing.Small,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color:
+                        selectedQuantity.value == quantity.value
+                          ? "white"
+                          : "black",
+                      fontSize: Font.Small,
+                    }}
+                  >
+                    {quantity.label}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </View>
+      <FontText style={{ marginBottom: 15 }}>{item.description}</FontText>
+    </>
+  );
+};
+
 export default function Vegetables({ navigation }) {
   const [vegetables, setVegetables] = useState([]);
   const [imageState, setImageState] = useState([]);
-
-  const handleQuantityChange = (index, value) => {
-    const state = [...vegetables];
-    state[index].initialQuantity = value;
-    setVegetables(state);
-  };
 
   const fetchVegetables = async () => {
     try {
@@ -140,111 +296,15 @@ export default function Vegetables({ navigation }) {
           newObj.key = index;
           return newObj;
         });
+        const dis = (item.price / 100) * item.discount;
+        const discountedPrice = item.price - dis;
         return (
-          <>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                marginVertical: Spacing.Large,
-              }}
-            >
-              {findImage(item._id) ? (
-                <Image
-                  source={{ uri: findImage(item._id) }}
-                  style={{ width: 70, height: 70, borderRadius: 5 }}
-                />
-              ) : (
-                <View style={{ width: 70, height: 70, borderRadius: 5 }} />
-              )}
-              {/* {findImage(item._id)} */}
-              <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                    {item.name}
-                  </Text>
-                  {item.status.toLowerCase() === "available" ? (
-                    <TouchableOpacity
-                      style={{
-                        borderRadius: 5,
-                        backgroundColor: theme.backgroundColor,
-                        paddingHorizontal: Spacing.ExtraLarge,
-                        paddingVertical: Spacing.ExtraSmall,
-                      }}
-                    >
-                      <Text style={{ color: "white" }}>Add</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <View style={{ display: "flex", position: 'absolute', right: 0, alignItems:"center", top: 10 }}>
-                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.Primary }}>Out</FontText>
-                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.ExtraSmall }}>Of</FontText>
-                      <FontText style={{ color: "red", fontWeight: "bold", fontSize: Font.Primary }}>Stock</FontText>
-                    </View>
-                  )}
-                </View>
-                <View style={{ display: "flex", flexDirection: "row" }}>
-                  <Text
-                    style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}
-                  >
-                    ₹ {item.price}/{item.priceUnit}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginTop: Spacing.Small,
-                  }}
-                >
-                  <FlatList
-                    data={availableQuantity}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item) => item.key}
-                    renderItem={({ item: quantity }) => (
-                      <TouchableOpacity
-                        onPress={() =>
-                          handleQuantityChange(itemIndex, quantity.value)
-                        }
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          height: 20,
-                          backgroundColor:
-                            item.initialQuantity[0].value == quantity.value
-                              ? theme.backgroundColor
-                              : theme.lightgrey,
-                          marginRight: Spacing.ExtraSmall,
-                          borderRadius: 100,
-                          paddingHorizontal: Spacing.Small,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color:
-                              item.initialQuantity[0].value == quantity.value
-                                ? "white"
-                                : "black",
-                            fontSize: Font.Small,
-                          }}
-                        >
-                          {quantity.label}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  />
-                </View>
-              </View>
-            </View>
-            <FontText style={{ marginBottom: 15 }}>{item.description}</FontText>
-          </>
+          <Item
+            item={item}
+            findImage={findImage}
+            discountedPrice={discountedPrice}
+            availableQuantity={availableQuantity}
+          />
         );
       })}
     </ScrollView>

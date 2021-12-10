@@ -117,15 +117,23 @@ import NewsPaperScreen from "../screens/NewsPaper";
 import DairyProducts from "../screens/DairyProducts";
 import CartScreen from "../screens/CartScreen";
 import OrderHistory from "./OrderHistory";
+import * as SecureStore from "expo-secure-store";
 import Tifin from "../screens/TifinScreen";
 import Flowers from "../screens/FlowersScreen";
+import AccountScreen from "../screens/AccountScreen";
+import Loading from "../components/Loading";
 
-function NotificationsScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Button onPress={() => navigation.goBack()} title="Go back home" />
-    </View>
-  );
+
+
+const LogOutScreen =({ navigation })=>{
+  const removeTOken = async ()=>{
+    await SecureStore.deleteItemAsync('token')
+    navigation.navigate('LoginScreen')
+  }
+  React.useEffect(()=>{
+    removeTOken()
+  },[navigation])
+  return <Loading />
 }
 
 // const theme = {
@@ -138,7 +146,33 @@ function NotificationsScreen({ navigation }) {
 
 const Drawer = createDrawerNavigator();
 
-export default function App() {
+export default function App({ navigation, route }) {
+  // const [tokenLoaded, setTokenLoaded] = React.useState(true);
+  // const [token, setToken] = React.useState("");
+
+  // const check = async () => {
+  //   try {
+  //     const r = await getValueFor();
+  //     setToken(r);
+  //     setTokenLoaded(false);
+  //   } catch (err) {
+  //     setTokenLoaded(false);
+  //   } finally {
+  //     console.log(token);
+  //   }
+  // };
+  const handleAuth = (navigation) => {
+      navigation.navigate("Account");
+    
+  };
+  // React.useEffect(() => {
+  //   const unsubscribe = navigation.addListener("focus", async () => {
+  //     try {
+  //       check()
+  //     } catch (error) {}
+  //   });
+  //   return unsubscribe;
+  // }, [navigation, route]);
   return (
     <Drawer.Navigator initialRouteName="Home">
       <Drawer.Screen
@@ -166,7 +200,7 @@ export default function App() {
                   <AntDesign name="shoppingcart" size={15} color="white" />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("LoginScreen")}
+                  onPress={() => handleAuth(navigation)}
                   style={{
                     width: 35,
                     height: 35,
@@ -233,7 +267,7 @@ export default function App() {
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => handleAuth(navigation)}
                 style={{
                   width: 35,
                   height: 35,
@@ -281,7 +315,7 @@ export default function App() {
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => handleAuth(navigation)}
                 style={{
                   width: 35,
                   height: 35,
@@ -329,7 +363,7 @@ export default function App() {
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => handleAuth(navigation)}
                 style={{
                   width: 35,
                   height: 35,
@@ -377,7 +411,7 @@ export default function App() {
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => handleAuth(navigation)}
                 style={{
                   width: 35,
                   height: 35,
@@ -425,7 +459,7 @@ export default function App() {
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => handleAuth(navigation)}
                 style={{
                   width: 35,
                   height: 35,
@@ -475,7 +509,7 @@ export default function App() {
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
               <TouchableOpacity
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => handleAuth(navigation)}
                 style={{
                   width: 35,
                   height: 35,
@@ -516,10 +550,6 @@ export default function App() {
         component={DairyProducts}
       />
       <Drawer.Screen
-        name="NotificationScreen"
-        component={NotificationsScreen}
-      />
-      <Drawer.Screen
         options={({ navigation }) => {
           return {
             title: "History",
@@ -544,7 +574,7 @@ export default function App() {
                   <AntDesign name="shoppingcart" size={15} color="white" />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("LoginScreen")}
+                  onPress={() => handleAuth(navigation)}
                   style={{
                     width: 35,
                     height: 35,
@@ -587,16 +617,102 @@ export default function App() {
         name="History"
         component={OrderHistory}
       />
-      <Drawer.Screen
-        options={{ headerShown: false }}
-        name="SignUpScreen"
-        component={SighUpScreen}
-      />
-      <Drawer.Screen
-        options={{ headerShown: false }}
-        name="LoginScreen"
-        component={LoginScreen}
-      />
+      {false ? (
+        <>
+          {/* <Drawer.Screen
+            options={{ headerShown: false }}
+            name="SignUpScreen"
+            component={SighUpScreen}
+          />
+          <Drawer.Screen
+            options={{ headerShown: false }}
+            name="LoginScreen"
+            component={LoginScreen}
+          /> */}
+        </>
+      ) : (
+        <>
+        <Drawer.Screen
+          options={({ navigation }) => {
+            return {
+              title: "My Account",
+              headerTitleAlign: "center",
+              headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+              headerRight: () => (
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("CartScreen")}
+                    style={{
+                      width: 35,
+                      height: 35,
+                      borderRadius: 25,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: theme.backgroundColorlight,
+                      marginRight: 15,
+                      marginTop: 5,
+                    }}
+                  >
+                    <AntDesign name="shoppingcart" size={15} color="white" />
+                  </TouchableOpacity>
+                </View>
+              ),
+              headerLeft: () => (
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <TouchableOpacity
+                    onPress={() => navigation.openDrawer()}
+                    style={{
+                      width: 35,
+                      height: 35,
+                      borderRadius: 25,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: theme.backgroundColorlight,
+                      marginLeft: 15,
+                      marginTop: 5,
+                    }}
+                  >
+                    <AntDesign name="bars" size={15} color="white" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("History")}
+                    style={{
+                      width: 35,
+                      height: 35,
+                      borderRadius: 25,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: theme.backgroundColorlight,
+                      marginLeft: 15,
+                      marginTop: 5,
+                    }}
+                  >
+                    <FontAwesome5 name="history" size={15} color="white" />
+                  </TouchableOpacity>
+                </View>
+              ),
+              headerShadowVisible: false,
+            };
+          }}
+          name="Account"
+          component={AccountScreen}
+        />
+        <Drawer.Screen
+          options={({ navigation }) => {
+            return {
+              title: "Logout",
+              headerShadowVisible: false,
+            };
+          }}
+          name="Logout"
+          component={LogOutScreen}
+        />
+        </>
+      )}
+
     </Drawer.Navigator>
   );
 }

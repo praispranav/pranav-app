@@ -6,8 +6,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import  AppNavigator from "./navigation/AppNavigator";
 import axios from 'axios'
+import Loading from "./components/Loading";
 
-axios.defaults.baseURL = "https://hris-app-backend.azurewebsites.net"
+axios.defaults.baseURL = "http://192.168.1.70:3000"
 
 const INITIAL_STATE_LOADING = {
   loadingFont: true,
@@ -29,7 +30,7 @@ export default function App() {
   useEffect(() => {
     loadFonts();
   }, []);
-  if (loading.loadingFont) return (<View ><Text>LoadLoading Loading Loading Loadaskldkasjdksajkdjklasjklasjkdasjklasjkldsajing</Text></View>);
+  if (loading.loadingFont) return <Loading />
 
   return (
     <SafeAreaProvider>

@@ -15,10 +15,10 @@ import theme from "../config/theme";
 import { ActivityIndicator } from "react-native";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import LoadingScreen from "../components/Loading"
+import LoadingScreen from "../components/Loading";
 
 async function save(key, value) {
-  return await SecureStore.setItemAsync(key, value);
+  return await SecureStore.setItemAsync("token", value);
 }
 
 function getValueFor(key) {
@@ -40,41 +40,42 @@ const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
 export default function LoginScreen(props) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(true);
+  const [phone, setPhone] = useState(true);
+  const [otp, setOpt] = useState("");
+  const [otpRequested, setOtpRequested] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [ verifyingTOken , setVerifyingToken]  = useState(true)
+  const [verifyingTOken, setVerifyingToken] = useState(true);
 
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("");
 
-  const submit = async () => {
+  const sendOtp = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/user/auth/login", {
-        username,
-        password,
-      });
-      await save("token", response.data.token);
+      let value;
+      if (email) value = { email: email };
+      if (phone) value = { phone: phone };
+      const response = await axios.post("/user/auth/reqforotp", value);
+      //   await save("token", response.data.token);
       Alert.alert(
-        "Login Successful",
+        "Otp Sent",
         response.data.message,
         [
           {
             text: "OK",
-            onPress: () => props.navigation.navigate("HomeScreen"),
             style: "cancel",
           },
         ],
         {
           cancelable: true,
-          onDismiss: () => props.navigation.navigate("HomeScreen"),
         }
       );
       setLoading(false);
+      setOtpRequested(true)
     } catch (error) {
       setLoading(false);
-      console.log(error)
+      console.log(error);
       Alert.alert(
         "Error",
         "Login Failed",
@@ -87,42 +88,117 @@ export default function LoginScreen(props) {
         ],
         {
           cancelable: true,
-          onDismiss: () => props.navigation.navigate("HomeScreen"),
         }
       );
       console.warn(error);
     }
   };
+
+  const submit = async () => {
+    try {
+      setLoading(true);
+      let value;
+      if (email) value = { email: email, otp:otp };
+      if (phone) value = { phone: phone, otp: otp };
+      const response = await axios.post("/user/auth/otpverify", value);
+      //   await save("token", response.data.token);
+
+      if(response.status !== 201){
+        Alert.alert(
+            "Otp Sent",
+            response.data.message,
+            [
+              {
+                text: "OK",
+                style: "cancel",
+              },
+            ],
+            {
+              cancelable: true,
+            }   )  
+      }
+       if(response.status === 200 ) {
+        save("k",response.data.token.toString())
+           Alert.alert(
+             "Otp Sent",
+             response.data.message,
+             [
+               {
+                 text: "OK",
+                 onPress: () => props.navigation.navigate("Drawer"),
+                 style: "cancel",
+               },
+             ],
+             {
+               cancelable: true,
+               onDismiss: () => props.navigation.navigate("Drawer"),
+             }
+           );
+       }
+      setLoading(false);
+      setOtpRequested(true)
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      Alert.alert(
+        "Error",
+        "Could Not Sent Otp",
+        [
+          {
+            text: "OK",
+            onPress: () => props.navigation.navigate("LoginScreen"),
+            style: "cancel",
+          },
+        ],
+        {
+          cancelable: true,
+          onDismiss: () => props.navigation.navigate("Drawer"),
+        }
+      );
+      console.warn(error);
+    }
+  };
+
+  const callback = () =>{
+      if(otpRequested){
+          submit()
+      } 
+      if(!otpRequested){
+          sendOtp()
+      }
+  }
+
   const check = async () => {
     try {
       const r = await getValueFor();
-      console.log('Function Called')
-      setToken(r)
+      console.log("Function Called");
+      setToken(r);
       props.navigation.navigate("Drawer");
     } catch (error) {}
   };
   useEffect(() => {
     check();
-    
+
     const unsubscribe = props.navigation.addListener("focus", async () => {
-      
       try {
-        if(token.length > 100){
+        if (token.length > 100) {
           props.navigation.navigate("Drawer");
         }
         const r = await getValueFor();
         if (r.length > 100) {
-          setToken(r)
+          setToken(r);
           props.navigation.navigate("HomeScreen");
-        } else{
-          setVerifyingToken(false)
+        } else {
+          setVerifyingToken(false);
         }
-      } catch (error) { setVerifyingToken(false)}
+      } catch (error) {
+        setVerifyingToken(false);
+      }
     });
 
     return unsubscribe;
   }, [token]);
-  if(verifyingTOken) return <LoadingScreen />
+  if (verifyingTOken) return <LoadingScreen />;
   return (
     <View style={{ display: "flex", flex: 1 }}>
       <View
@@ -156,41 +232,42 @@ export default function LoginScreen(props) {
               borderRadius: Spacing.ExtraLarge,
             }}
             textStyle={{ color: "white" }}
-            text="Login"
+            text="Forget"
           />
           <Button
             textStyle={{ color: "black" }}
             onPress={() => {
-              props.navigation.navigate("SignUpScreen");
+              props.navigation.navigate("LoginScreen");
             }}
-            text="Signup"
+            text="Login"
           />
         </View>
         <View style={{ marginVertical: Spacing.Normal }}>
-          <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
-              placeholder={"Enter Your Mobile or Email Here"}
-              onChangeText={setUsername}
-            />
-          </View>
-
-          <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
-              placeholder={"Enter Your Password Here"}
-              onChangeText={setPassword}
-            />
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-end",
-              }}
-            >
-              <TouchableOpacity onPress={()=> props.navigation.navigate('ForgetPassword')} style={{  marginTop: 10 }}>
-                <Text style={{ color: "rgb(170,170,170)", }}>Forget Password</Text>
-              </TouchableOpacity>
+          {phone == true ? (
+            <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
+              <Input
+                placeholder={"Enter Your Mobile or Email Here"}
+                onChangeText={setEmail}
+              />
             </View>
-          </View>
+          ) : (
+            <></>
+          )}
+          {email == true ? (
+            <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
+              <Input
+                placeholder={"Enter Your Mobile or Email Here"}
+                onChangeText={setPhone}
+              />
+            </View>
+          ) : (
+            <></>
+          )}
+          {otpRequested && (
+            <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
+              <Input placeholder={"Enter Otp"} onChangeText={setOpt} />
+            </View>
+          )}
         </View>
 
         <View
@@ -208,13 +285,19 @@ export default function LoginScreen(props) {
             ]}
           >
             <Button
-              onPress={submit}
+              onPress={callback}
               containerStyle={{
                 backgroundColor: theme.backgroundColor,
                 borderRadius: Spacing.ExtraLarge,
               }}
               textStyle={{ color: "white" }}
-              text={loading ? <ActivityIndicator color="white" /> : "Login"}
+              text={
+                loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  "Submit"
+                )
+              }
             />
           </View>
         </View>

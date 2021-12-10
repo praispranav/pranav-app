@@ -4,9 +4,11 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Alert,
   Image,
   ScrollView,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import theme from "../config/theme";
 import { Font } from "../constants/Fonts";
@@ -14,7 +16,19 @@ import { Spacing } from "../constants/MarginPadding";
 import TextFont from "../elements/Text";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import moment from "moment";
+import { useQuery } from "../hooks/useQuery";
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
 // import DateTimePicker from "@react-native-community/datetimepicker";
+
+// async function getValueFor(key) {
+//   let result = await SecureStore.getItemAsync("token");
+//   if (result) {
+//     return result;
+//   } else {
+//     return false;
+//   }
+// }
 
 const styles = StyleSheet.create({
   screen: {
@@ -120,12 +134,263 @@ const Products = [
   },
 ];
 
-export default function CartScreen() {
-  const [subscriptionData, setSubscriptionData] = useState([]);
-  const [products, setProducts] = useState([]);
+async function getValueFor(key) {
+  let result = await SecureStore.getItemAsync("token");
+  if (result) {
+    return result;
+  } else {
+    return false;
+  }
+}
 
-  const [fromDateVisible, setFromDateVisible] = useState(false);
-  const [toVisible, setToDateVisible] = useState(false);
+function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
+  const [imageState, setImageState] = useState(false);
+  const [selectedQuantity, setSelectedQuantity] = useState({
+    label: "",
+    value: "",
+  });
+  const [setQuantity] = useQuery("/order/cart/edit/");
+  const [deleteLoading, setDeleteLoading] = useState(false)
+
+  const getImage = async () => {
+    if (imageState) return;
+    try {
+      const responseawait = await axios.get(
+        `/category/image/id/${item.productId}`
+      );
+      setImageState(responseawait.data[0].image);
+    } catch (error) {
+      console.log(error);
+    }
+    // return responseawait.data
+  };
+
+  const deleteItem = async () => {
+    setDeleteLoading(true)
+    try {
+      const t = await getValueFor();
+      console.warn(item._id)
+      const response = await axios.post("/order/cart/delete", {
+        token: t,
+        _id: item._id,
+      });
+      setDeleteLoading(false)
+      setCalculate()
+      console.warn(response.data)
+      // Alert.alert(
+      //   "Error",
+      //   response.data.message,
+      //   [
+      //     {
+      //       text: "OK",
+      //       style: "cancel",
+      //     },
+      //   ],
+      //   {
+      //     cancelable: true,
+      //   }
+      // );
+    } catch (error) {
+      console.log(error)
+      setDeleteLoading(false)
+      Alert.alert(
+        "Error",
+        "Something Went Wrong.",
+        [
+          {
+            text: "OK",
+            style: "cancel",
+          },
+        ],
+        {
+          cancelable: true,
+        }
+      );
+    } finally{
+      console.log("Ended")
+    }
+  };
+
+  const handleQuantityChange = (qty) => {
+    setSelectedQuantity(qty);
+    console.warn(qty);
+    setQuantity(null, { _id: item._id, selectedQuantity: qty.value });
+    setCalculate((prevState) => prevState + 1);
+  };
+
+  useEffect(() => {
+    getImage();
+    setSelectedQuantity({ label: "", value: item.selectedQuantity });
+  }, [item.selectedQuantity]);
+  const dis = (item.price / 100) * item.discount;
+  const discountedPrice = item.price - dis;
+  return (
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        marginVertical: Spacing.Large,
+      }}
+    >
+      <View style={{ position: "absolute", right: 0, top: 5 }}>
+        <TouchableOpacity
+          onPress={() => deleteItem()}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: 20,
+            backgroundColor:
+              theme.redLight,
+            marginRight: Spacing.ExtraSmall,
+            borderRadius: 100,
+            paddingHorizontal: Spacing.Small,
+          }}
+        >
+          <Text
+            style={{
+              color: "black",
+              fontSize: Font.Small,
+            }}
+          >
+            {deleteLoading ? <ActivityIndicator color="red" /> : "Delete"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {imageState ? (
+        <Image
+          source={{ uri: imageState }}
+          style={{ width: 70, height: 70, borderRadius: 5 }}
+        />
+      ) : (
+        <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+      )}
+      <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+            {item.name}
+          </Text>
+          {/* <TouchableOpacity
+          style={{
+            borderRadius: 5,
+            backgroundColor: theme.backgroundColor,
+            paddingHorizontal: Spacing.ExtraLarge,
+            paddingVertical: Spacing.ExtraSmall,
+          }}
+        >
+          <Text style={{ color: "white" }}>Add</Text>
+        </TouchableOpacity> */}
+        </View>
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
+            ₹ {discountedPrice}/{item.priceUnit}
+          </Text>
+          <Text
+            style={{
+              fontFamily: "MPlusBold",
+              fontSize: Font.Small,
+              textDecorationLine: "line-through",
+              color: "grey",
+              marginLeft: Spacing.Normal,
+            }}
+          >
+            ₹ {item.price}/{item.priceUnit}
+          </Text>
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            marginTop: Spacing.Small,
+          }}
+        >
+          <FlatList
+            data={availableQuantity}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.key}
+            renderItem={({ item: quantity }) => (
+              <TouchableOpacity
+                onPress={() => handleQuantityChange(quantity)}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 20,
+                  backgroundColor:
+                    selectedQuantity.value === quantity.value
+                      ? theme.backgroundColor
+                      : theme.lightgrey,
+                  marginRight: Spacing.ExtraSmall,
+                  borderRadius: 100,
+                  paddingHorizontal: Spacing.Small,
+                }}
+              >
+                <Text
+                  style={{
+                    color:
+                      selectedQuantity.value === quantity.value
+                        ? "white"
+                        : "black",
+                    fontSize: Font.Small,
+                  }}
+                >
+                  {quantity.value} {item.priceUnit}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+          {/* {availableQuantity.map((quantity) => (
+              <TouchableOpacity
+                onPress={() =>
+                  handleQuantityChange(itemIndex, quantity.value)
+                }
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: 30,
+                  height: 30,
+                  backgroundColor:
+                    item.initialQuantity === quantity.value
+                      ? theme.backgroundColor
+                      : theme.lightgrey,
+                  marginHorizontal: Spacing.ExtraSmall,
+                  borderRadius: 100,
+                }}
+              >
+                <Text
+                  style={{
+                    color:
+                      item.initialQuantity === quantity.value
+                        ? "white"
+                        : "black",
+                    fontSize: Font.Small,
+                  }}
+                >
+                  {quantity.label}
+                </Text>
+              </TouchableOpacity>
+            ))} */}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+export default function CartScreen({ navigation }) {
+  const [subscriptionData, setSubscriptionData] = useState([]);
+  // const [products, setProducts] = useState([]);
+  const [calculate, setCalculate] = useState(0);
+  const [fetchProducts, response, productsLoading, productError] = useQuery();
+
+  const products = response.data || [];
 
   const findDayIndex = (day) => {};
 
@@ -151,16 +416,65 @@ export default function CartScreen() {
     setSubscriptionData(data);
   };
 
-  const handleQuantityChange = (index, value) => {
-    const state = [...products];
-    state[index].initialQuantity = value;
-    setProducts(state);
-  };
-
   useEffect(() => {
-    setProducts(Products);
+    const uns = navigation.addListener("focus", () => {
+      fetchProducts("/order/cart/get");
+    });
+    return uns;
+  }, [navigation]);
+
+  const [proceedLoading, setProceedLoading] = useState();
+  useEffect(() => {
     setSubscriptionData(SubscriptionData);
   }, []);
+
+  const getAddress = async () => {
+    setProceedLoading(true);
+    try {
+      const t = await getValueFor();
+      const response = await axios.post("/user/address/get", {
+        token: t && t.length > 100 ? t : "",
+      });
+      const length = response.data.length;
+      if (length == 0) {
+        Alert.alert(
+          "Error",
+          "Please Add An Address. By Going My Account Section",
+          [
+            {
+              text: "OK",
+              style: "cancel",
+            },
+          ],
+          {
+            cancelable: true,
+          }
+        );
+      }
+      if (response.data.length > 0) {
+        navigation.navigate("PaymentPage");
+      }
+      setProceedLoading(false);
+    } catch (error) {
+      console.log(error);
+      setProceedLoading(false);
+      Alert.alert(
+        "Error",
+        "Please Add An Address.",
+        [
+          {
+            text: "OK",
+            style: "cancel",
+          },
+        ],
+        {
+          cancelable: true,
+        }
+      );
+    }
+  };
+
+  console.log(products);
   return (
     <View style={styles.screen}>
       <ScrollView style={styles.scrollView}>
@@ -174,150 +488,8 @@ export default function CartScreen() {
           >
             Subscriptions
           </Text>
-          {subscriptionData.map((item, subscriptionIndex) => {
-            const checkDays = (currentDay) => {
-              const a = item.days.findIndex((dayCh) => dayCh === currentDay);
-              if (a !== -1) return true;
-              return false;
-            };
-            return (
-              <View style={{ marginBottom: Spacing.Large }}>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginVertical: Spacing.Large,
-                  }}
-                >
-                  <Image
-                    source={item.image}
-                    style={{ width: 70, height: 70, borderRadius: 5 }}
-                  />
-                  <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                        {item.name}
-                      </Text>
-                      {/* <TouchableOpacity
-                        style={{
-                          borderRadius: 5,
-                          backgroundColor: theme.backgroundColor,
-                          paddingHorizontal: Spacing.ExtraLarge,
-                          paddingVertical: Spacing.ExtraSmall,
-                        }}
-                      >
-                        <Text style={{ color: "white" }}>Add</Text>
-                      </TouchableOpacity> */}
-                    </View>
-                    <View style={{ display: "flex", flexDirection: "row" }}>
-                      <Text
-                        style={{
-                          fontFamily: "MPlusBold",
-                          fontSize: Font.Small,
-                        }}
-                      >
-                        ₹ {item.price}/{item.priceUnit}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        marginTop: Spacing.Small,
-                      }}
-                    >
-                      <View style={{ display: "flex", flexDirection: "row" }}>
-                        <Text style={{ color: "Black" }}>From {"  "}- </Text>
-                        <TouchableOpacity
-                          onPress={() => setFromDateVisible((prev) => !prev)}
-                        >
-                          <Text
-                            style={{ marginHorizontal: Spacing.ExtraSmall }}
-                          >
-                            {item.fromDate}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                      {/* {fromDateVisible && (
-                        <DateTimePicker
-                          onChange={() => console.log("hello")}
-                          value={new Date()}
-                          display="default"
-                          mode="date"
-                        />
-                      )}
-                      {toVisible && (
-                        <DateTimePicker
-                          onChange={() => console.log("Hello")}
-                          value={new Date()}
-                          display="default"
-                          mode="date"
-                        />
-                      )} */}
-                      <View
-                        style={{
-                          marginLeft: Spacing.Medium,
-                          display: "flex",
-                          flexDirection: "row",
-                        }}
-                      >
-                        <Text>To {"  -"}</Text>
-                        <TouchableOpacity
-                          onPress={() => setToDateVisible((prev) => !prev)}
-                        >
-                          <Text style={{ marginLeft: Spacing.ExtraSmall }}>
-                            {item.toDate}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  {days.map((day) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        handleDaySelector(subscriptionIndex, item.days, day)
-                      }
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingHorizontal: 10,
-                        height: 20,
-                        borderRadius: 50,
-                        backgroundColor: checkDays(day)
-                          ? theme.backgroundColor
-                          : theme.lightgrey,
-                      }}
-                    >
-                      <Text
-                        style={{ color: checkDays(day) ? "white" : "black" }}
-                      >
-                        {day}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            );
-          })}
         </View>
-
+        {console.log("responseData", response)}
         <View>
           <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Large }}>
             Products
@@ -325,137 +497,22 @@ export default function CartScreen() {
           {products.map((item, itemIndex) => {
             const availableQuantity = item.availableQuantity.map((i, index) => {
               const newObj = new Object();
-              newObj.value = i;
-              newObj.label = i + item.unit;
+              newObj.value = i.value;
+              newObj.label = i.label + item.unit;
               newObj.key = index;
               return newObj;
             });
             return (
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  marginVertical: Spacing.Large,
-                }}
-              >
-                <Image
-                  source={item.image}
-                  style={{ width: 70, height: 70, borderRadius: 5 }}
-                />
-                <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                      {item.name}
-                    </Text>
-                    {/* <TouchableOpacity
-                      style={{
-                        borderRadius: 5,
-                        backgroundColor: theme.backgroundColor,
-                        paddingHorizontal: Spacing.ExtraLarge,
-                        paddingVertical: Spacing.ExtraSmall,
-                      }}
-                    >
-                      <Text style={{ color: "white" }}>Add</Text>
-                    </TouchableOpacity> */}
-                  </View>
-                  <View style={{ display: "flex", flexDirection: "row" }}>
-                    <Text
-                      style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}
-                    >
-                      ₹ {item.price}/{item.priceUnit}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      marginTop: Spacing.Small,
-                    }}
-                  >
-                    <FlatList
-                      data={availableQuantity}
-                      horizontal={true}
-                      showsHorizontalScrollIndicator={false}
-                      keyExtractor={(item) => item.key}
-                      renderItem={({ item: quantity }) => (
-                        <TouchableOpacity
-                          onPress={() =>
-                            handleQuantityChange(itemIndex, quantity.value)
-                          }
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            height: 20,
-                            backgroundColor:
-                              item.initialQuantity === quantity.value
-                                ? theme.backgroundColor
-                                : theme.lightgrey,
-                            marginRight: Spacing.ExtraSmall,
-                            borderRadius: 100,
-                            paddingHorizontal: Spacing.Small,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color:
-                                item.initialQuantity === quantity.value
-                                  ? "white"
-                                  : "black",
-                              fontSize: Font.Small,
-                            }}
-                          >
-                            {quantity.label}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    />
-                    {/* {availableQuantity.map((quantity) => (
-                          <TouchableOpacity
-                            onPress={() =>
-                              handleQuantityChange(itemIndex, quantity.value)
-                            }
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              width: 30,
-                              height: 30,
-                              backgroundColor:
-                                item.initialQuantity === quantity.value
-                                  ? theme.backgroundColor
-                                  : theme.lightgrey,
-                              marginHorizontal: Spacing.ExtraSmall,
-                              borderRadius: 100,
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color:
-                                  item.initialQuantity === quantity.value
-                                    ? "white"
-                                    : "black",
-                                fontSize: Font.Small,
-                              }}
-                            >
-                              {quantity.label}
-                            </Text>
-                          </TouchableOpacity>
-                        ))} */}
-                  </View>
-                </View>
-              </View>
+              <NormalProducts
+                item={item}
+                setCalculate={() => fetchProducts("/order/cart/get")}
+                availableQuantity={availableQuantity}
+              />
             );
           })}
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity onPress={getAddress} style={styles.button}>
         <View
           style={{
             display: "flex",
@@ -463,7 +520,13 @@ export default function CartScreen() {
             alignItems: "center",
           }}
         >
-          <TextFont style={{ fontSize: 30, color: "white" }}>1000</TextFont>
+          <TextFont style={{ fontSize: 30, color: "white" }}>
+            {productsLoading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              response.total
+            )}
+          </TextFont>
           <View
             style={{
               display: "flex",
@@ -483,7 +546,9 @@ export default function CartScreen() {
             alignItems: "center",
           }}
         >
-          <TextFont style={styles.text}>Proceed</TextFont>
+          <TextFont style={styles.text}>
+            {proceedLoading ? <ActivityIndicator color="white" /> : "Proceed"}
+          </TextFont>
           <AntDesign color="white" name="caretright" size={15} />
         </View>
       </TouchableOpacity>

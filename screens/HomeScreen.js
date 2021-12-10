@@ -160,7 +160,7 @@ export default function HomeScreen({ navigation }) {
           flexWrap: "wrap",
         }}
       >
-        {products.map((item) => (
+        {/* {products.map((item) => (
           <TouchableOpacity
             style={{
               width: "48%",
@@ -177,7 +177,7 @@ export default function HomeScreen({ navigation }) {
             {item.icon}
             <Text style={{ marginTop: Spacing.Small }}>{item.label}</Text>
           </TouchableOpacity>
-        ))}
+        ))} */}
       </View>
       <View style={{ marginVertical: 20 }} />
     </ScrollView>
