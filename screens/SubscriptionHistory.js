@@ -1,18 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   TouchableOpacity,
   View,
   Text,
   StyleSheet,
-  Image,ScrollView, Touchable
+  Image,
+  ScrollView,
+  Touchable,
 } from "react-native";
 import theme from "../config/theme";
 import { Font } from "../constants/Fonts";
 import TextFont from "../elements/Text";
 import { Spacing } from "../constants/MarginPadding";
 import moment from "moment";
+import axios from "axios";
+import Loading from "../components/Loading";
+import * as SecureStore from "expo-secure-store";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"];
+async function getValueFor(key) {
+  let result = await SecureStore.getItemAsync("token");
+  if (result) {
+    return result;
+  } else {
+    return false;
+  }
+}
 
 const styles = StyleSheet.create({
   screen: {
@@ -124,112 +137,289 @@ const styles = StyleSheet.create({
   },
 });
 
-const data = [
-  {
-    id: "1",
-    name: "Grapes",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Processing",
-    orderDate: new Date(),
-  },
-  {
-    id: "2",
-    name: "Orange",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["5"],
-    initialQuantity: "5",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Closed",
-    orderDate: new Date(),
-  },
-  {
-    id: "3",
-    name: "Apple",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["10"],
-    initialQuantity: "10",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Closed",
-    orderDate: new Date(),
-  },
-  {
-    id: "4",
-    name: "Milk",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["10"],
-    initialQuantity: "10",
-    unit: "liter",
-    price: "100",
-    priceUnit: "liter",
-    status: "Rejected",
-    orderDate: new Date(),
-  },
-];
-const dataActive = [
-  {
-    id: "1",
-    name: "Grapes",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Active",
-    orderDate: new Date(),
-    days: ["Sun", "Mon", "Tue"],
-  },
-  {
-    id: "2",
-    name: "Orange",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["5"],
-    initialQuantity: "5",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Confirmed",
-    orderDate: new Date(),
-    days: ["Mon", "Tue", "Thr", "Sat"],
-  },
-  {
-    id: "3",
-    name: "Apple",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["10"],
-    initialQuantity: "10",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-    status: "Active",
-    orderDate: new Date(),
-    days: ["Sun", "Mon", "Tue", "Thr", "Sat"],
-  },
-  {
-    id: "4",
-    name: "Milk",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["10"],
-    initialQuantity: "10",
-    unit: "liter",
-    price: "100",
-    priceUnit: "liter",
-    status: "Active",
-    orderDate: new Date(),
-    days: ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri"],
-  },
-];
+const InactiveProducts = ({
+  navigation,
+  item,
+  getBackgroundColor,
+  getBadgeColor,
+}) => {
+  const [loading, setLoading] = useState();
+  const [imageState, setImageState] = useState(false);
+  const getImage = async () => {
+    if (imageState) return;
+    try {
+      const responseawait = await axios.get(
+        `/category/image/id/${item.productId}`
+      );
+      setImageState(responseawait.data[0].image);
+    } catch (error) {
+      console.log(error);
+    }
+    // return responseawait.data
+  };
+  useEffect(() => {
+    getImage();
+  }, []);
+  const data = JSON.stringify(item)
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Subscription Detail", { data: data })}
+      style={[
+        styles.mainContainer,
+        { backgroundColor: getBackgroundColor(item.status) },
+      ]}
+    >
+      <View style={{ position: "relative" }}>
+        <View style={{ position: "relative" }}>
+          {imageState ? (
+            <>
+              <Image
+                source={{ uri: imageState }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+            </>
+          ) : (
+            <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+          )}
+        </View>
+      </View>
+      <View style={styles.childContainer}>
+        <View>
+          <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+            {item.name}
+          </Text>
+          <View style={getBadgeColor(item.status)}>
+            <Text style={styles.statusStyle}>{item.status}</Text>
+          </View>
+          <Text
+            style={{
+              color: "black",
+              fontSize: Font.Small,
+              marginTop: Spacing.ExtraSmall,
+            }}
+          >
+            {item.selectedQuantity + " " + item.priceUnit} --{" "}
+            {moment(item.orderDate).format("YYYY-MM-DD")}
+          </Text>
+        </View>
+        <View
+          style={{
+            alignSelf: "flex-end",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>Total</Text>
+          <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}> Amount</Text>
+          <Text>{item.price * item.selectedQuantity}</Text>
+          {item.status.toLowerCase() === "processing" && (
+            <TouchableOpacity
+              // onPress={() => fetch({ type: false, body: { id: item._id } })}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: 20,
+                backgroundColor: theme.redLight,
+                marginRight: Spacing.ExtraSmall,
+                borderRadius: 100,
+                paddingHorizontal: Spacing.Small,
+              }}
+            >
+              <Text
+                style={{
+                  color: "black",
+                  fontSize: Font.Small,
+                }}
+              >
+                {loading ? <ActivityIndicator color="red" /> : "Delete"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const ActiveItem = ({
+  navigation,
+  item,
+  getBackgroundColor,
+  getBadgeColor,
+  checkDays,
+}) => {
+  const [loading, setLoading] = useState();
+  const [imageState, setImageState] = useState(false);
+  const getImage = async () => {
+    if (imageState) return;
+    try {
+      const responseawait = await axios.get(
+        `/category/image/id/${item.productId}`
+      );
+      setImageState(responseawait.data[0].image);
+    } catch (error) {
+      console.log(error);
+    }
+    // return responseawait.data
+  };
+  useEffect(() => {
+    getImage();
+  }, []);
+  const data = JSON.stringify(item)
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Subscription Detail", { data: data })}
+    >
+      <View
+        style={[
+          styles.mainContainer,
+          {
+            backgroundColor: getBackgroundColor(item.status),
+            flexWrap: "wrap",
+          },
+        ]}
+      >
+        <View style={{ position: "relative" }}>
+          <View style={{ position: "relative" }}>
+            <View style={{ position: "relative" }}>
+              {imageState ? (
+                <>
+                  <Image
+                    source={{ uri: imageState }}
+                    style={{ width: 70, height: 70, borderRadius: 5 }}
+                  />
+                </>
+              ) : (
+                <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+              )}
+            </View>
+          </View>
+        </View>
+        <View style={styles.childContainer}>
+          <View>
+            <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
+              {item.name}
+            </Text>
+            <View style={getBadgeColor(item.status)}>
+              <Text style={styles.statusStyle}>{item.status}</Text>
+            </View>
+            <Text
+              style={{
+                color: "black",
+                fontSize: Font.Small,
+                marginTop: Spacing.ExtraSmall,
+              }}
+            >
+              {item.selectedQuantity + " " + item.priceUnit} --{" "}
+              {moment(item.orderDate).format("YYYY-MM-DD")}
+            </Text>
+          </View>
+          <View
+            style={{
+              alignSelf: "flex-end",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>Total</Text>
+            <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}>
+              {" "}
+              Amount
+            </Text>
+            <Text>{item.price * item.selectedQuantity}</Text>
+          </View>
+          {/* <Text>
+        Order Date: {moment(item.orderDate).format("YYYY/MM/DD")}
+      </Text> */}
+          {/* <View style={styles.blueBadge2}>
+      </View> */}
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+            marginTop: Spacing.Large,
+          }}
+        >
+          {days.map((day) => (
+            <TouchableOpacity
+              // onPress={() =>
+              //   handleDaySelector(subscriptionIndex, item.days, day)
+              // }
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingHorizontal: 10,
+                height: 20,
+                borderRadius: 50,
+                backgroundColor: checkDays(day)
+                  ? theme.backgroundColor
+                  : theme.lightgrey,
+              }}
+            >
+              <Text style={{ color: checkDays(day) ? "white" : "black" }}>
+                {day}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 export default function ProductHistory({ navigation }) {
+  const [dataActive, setDataActive] = useState([]);
+  const [inactive, setInactive] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  const filterActive = (originalData) => {
+    const list = originalData.filter(
+      (item) =>
+        item.status.toLowerCase() == "active" ||
+        item.status.toLowerCase() == "confirmed"
+    );
+    setDataActive(list);
+  };
+  const filterInactive = (originalData) => {
+    const list = originalData.filter(
+      (item) =>{
+        console.warn(item.status, item.status.toLowerCase() != "confirmed")
+        return item.status.toLowerCase() != "confirmed"
+      } 
+    );
+    const list2 = list.filter(
+      (item) =>{
+        console.warn(item.status, item.status.toLowerCase() != "confirmed")
+        return item.status.toLowerCase() != "active"
+      } 
+    );
+    setInactive(list2);
+  };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/order/subscription/get", {
+        token: await getValueFor(),
+      });
+      filterActive(response.data);
+      filterInactive(response.data);
+      setLoading(false);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      setLoading(false);
+    }
+  };
+
   const getBackgroundColor = (status) => {
     if (status.toLowerCase() === "delivered") return theme.lightgrey;
     if (status.toLowerCase() === "rejected") return theme.redLight;
@@ -248,34 +438,39 @@ export default function ProductHistory({ navigation }) {
     if (status.toLowerCase() === "closed") return styles.closedBadge;
   };
 
-  const handleDaySelector = (index, dayArray, value) => {
-    const data = [...subscriptionData];
-    const array = [...dayArray];
-    // console.warn(array)
-    const dayIndex = array.findIndex((d) => {
-      console.warn(d, value);
+  // const handleDaySelector = (index, dayArray, value) => {
+  //   const data = [...subscriptionData];
+  //   const array = [...dayArray];
+  //   // console.warn(array)
+  //   const dayIndex = array.findIndex((d) => {
+  //     console.warn(d, value);
 
-      return d == value;
-    });
-    console.warn(dayIndex);
-    if (dayIndex === -1) {
-      array.push(value);
-    } else {
-      console.log(array);
-      array.splice(dayIndex, 1);
-      console.log(array);
-    }
+  //     return d == value;
+  //   });
+  //   console.warn(dayIndex);
+  //   if (dayIndex === -1) {
+  //     array.push(value);
+  //   } else {
+  //     console.log(array);
+  //     array.splice(dayIndex, 1);
+  //     console.log(array);
+  //   }
 
-    data[index].days = array;
-    setSubscriptionData(data);
-  };
+  //   data[index].days = array;
+  //   setSubscriptionData(data);
+  // };
 
-  const handleQuantityChange = (index, value) => {
-    const state = [...products];
-    state[index].initialQuantity = value;
-    setProducts(state);
-  };
+  // const handleQuantityChange = (index, value) => {
+  //   const state = [...products];
+  //   state[index].initialQuantity = value;
+  //   setProducts(state);
+  // };
 
+  useEffect(() => {
+    const unsub = navigation.addListener("focus", () => fetchData());
+    return unsub;
+  }, [navigation]);
+  if (loading) return <Loading />;
   return (
     <View style={styles.screen}>
       <ScrollView>
@@ -292,154 +487,20 @@ export default function ProductHistory({ navigation }) {
 
         {dataActive.map((item) => {
           const checkDays = (currentDay) => {
-            const a = item.days.findIndex((dayCh) => dayCh === currentDay);
+            const a = item.days.findIndex(
+              (dayCh) => dayCh.toLowerCase() === currentDay.toLowerCase()
+            );
             if (a !== -1) return true;
             return false;
           };
           return (
-            <TouchableOpacity onPress={()=> navigation.navigate("Subscription Detail")}>
-              <View
-                style={[
-                  styles.mainContainer,
-                  {
-                    backgroundColor: getBackgroundColor(item.status),
-                    flexWrap: "wrap",
-                  },
-                ]}
-              >
-                <View style={{ position: "relative" }}>
-                  <Image
-                    source={item.image}
-                    style={{ borderRadius: 5, width: 70, height: 70 }}
-                  />
-                  <View style={styles.whiteBadge}>
-                    <Text>{item.id}</Text>
-                  </View>
-                </View>
-                <View style={styles.childContainer}>
-                  <View>
-                    <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                      {item.name}
-                    </Text>
-                    <View style={getBadgeColor(item.status)}>
-                      <Text style={styles.statusStyle}>{item.status}</Text>
-                    </View>
-                    <Text
-                      style={{
-                        color: "black",
-                        fontSize: Font.Small,
-                        marginTop: Spacing.ExtraSmall,
-                      }}
-                    >
-                      {item.availableQuantity[0] + " " + item.unit} --{" "}
-                      {moment(item.orderDate).format("YYYY-MM-DD")}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      alignSelf: "flex-end",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>
-                      Total
-                    </Text>
-                    <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}>
-                      {" "}
-                      Amount
-                    </Text>
-                    <Text>{item.price}</Text>
-                  </View>
-                  {/* <Text>
-                  Order Date: {moment(item.orderDate).format("YYYY/MM/DD")}
-                </Text> */}
-                  {/* <View style={styles.blueBadge2}>
-                </View> */}
-                </View>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    marginTop: Spacing.Large,
-                  }}
-                >
-                  {days.map((day) => (
-                    <TouchableOpacity
-                      // onPress={() =>
-                      //   handleDaySelector(subscriptionIndex, item.days, day)
-                      // }
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        paddingHorizontal: 10,
-                        height: 20,
-                        borderRadius: 50,
-                        backgroundColor: checkDays(day)
-                          ? theme.backgroundColor
-                          : theme.lightgrey,
-                      }}
-                    >
-                      <Text
-                        style={{ color: checkDays(day) ? "white" : "black" }}
-                      >
-                        {day}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <View
-                  style={{
-                    width: "100%",
-                    marginTop: Spacing.Small,
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <TouchableOpacity
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingHorizontal: 10,
-                      height: 20,
-                      borderRadius: 50,
-                      backgroundColor: theme.green2,
-                    }}
-                  >
-                    <Text style={{ color: "white", fontSize: Font.Small }}>
-                      Cancel Today
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingHorizontal: 10,
-                      height: 20,
-                      borderRadius: 50,
-                      backgroundColor: theme.green2,
-                      marginLeft: 10,
-                    }}
-                  >
-                    <Text style={{ color: "white", fontSize: Font.Small }}>
-                      Edit Days
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
+            <ActiveItem
+              item={item}
+              navigation={navigation}
+              checkDays={checkDays}
+              getBackgroundColor={getBackgroundColor}
+              getBadgeColor={getBadgeColor}
+            />
           );
         })}
         <TextFont
@@ -452,63 +513,16 @@ export default function ProductHistory({ navigation }) {
         >
           Others
         </TextFont>
-       {data.map((item) => {
-            return (
-              <TouchableOpacity onPress={()=> navigation.navigate("Subscription Detail")}
-                style={[
-                  styles.mainContainer,
-                  { backgroundColor: getBackgroundColor(item.status) },
-                ]}
-              >
-                <View style={{ position: "relative" }}>
-                  <Image
-                    source={item.image}
-                    style={{ borderRadius: 5, width: 70, height: 70 }}
-                  />
-                  <View style={styles.whiteBadge}>
-                    <Text>{item.id}</Text>
-                  </View>
-                </View>
-                <View style={styles.childContainer}>
-                  <View>
-                    <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-                      {item.name}
-                    </Text>
-                    <View style={getBadgeColor(item.status)}>
-                      <Text style={styles.statusStyle}>{item.status}</Text>
-                    </View>
-                    <Text
-                      style={{
-                        color: "black",
-                        fontSize: Font.Small,
-                        marginTop: Spacing.ExtraSmall,
-                      }}
-                    >
-                      {item.availableQuantity[0] + " " + item.unit} --{" "}
-                      {moment(item.orderDate).format("YYYY-MM-DD")}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      alignSelf: "flex-end",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={{ fontSize: 17, fontFamily: "MPlusBold" }}>
-                      Total
-                    </Text>
-                    <Text style={{ fontFamily: "MPlusBold", fontSize: 12 }}>
-                      {" "}
-                      Amount
-                    </Text>
-                    <Text>{item.price}</Text>
-                  </View>
-                  
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+        {inactive.map((item) => {
+          return (
+            <InactiveProducts
+              navigation={navigation}
+              item={item}
+              getBadgeColor={getBadgeColor}
+              getBackgroundColor={getBackgroundColor}
+            />
+          );
+        })}
       </ScrollView>
     </View>
   );

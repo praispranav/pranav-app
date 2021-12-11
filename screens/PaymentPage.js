@@ -1,10 +1,11 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,Alert,
+  ActivityIndicator,
+  Alert,
   StyleSheet,
 } from "react-native";
 import FontText from "../elements/Text";
@@ -13,19 +14,19 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import theme from "../config/theme";
 import * as SecureStore from "expo-secure-store";
 import { Font } from "../constants/Fonts";
-import TextFont from "../elements/Text"
+import TextFont from "../elements/Text";
 import Loading from "../components/Loading";
 import axios from "axios";
-import { useQuery } from "../hooks/useQuery"
+import { useQuery } from "../hooks/useQuery";
 
 async function getValueFor(key) {
-    let result = await SecureStore.getItemAsync("token");
-    if (result) {
-      return result;
-    } else {
-      return false;
-    }
+  let result = await SecureStore.getItemAsync("token");
+  if (result) {
+    return result;
+  } else {
+    return false;
   }
+}
 
 const styles = StyleSheet.create({
   screen: {
@@ -62,7 +63,8 @@ const AddressItem = ({
   pinCode,
   _id,
   fetch,
-  selectedAddress,item,
+  selectedAddress,
+  item,
   setSelectedAddress,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -103,10 +105,12 @@ const AddressItem = ({
     }
   };
   return (
-    <TouchableOpacity onPress={()=> setSelectedAddress(item)}
+    <TouchableOpacity
+      onPress={() => setSelectedAddress(item)}
       style={{
         marginTop: 15,
-        backgroundColor: selectedAddress._id === _id ? theme.themeLight: 'white',
+        backgroundColor:
+          selectedAddress._id === _id ? theme.themeLight : "white",
         padding: Spacing.Normal,
         borderRadius: 5,
       }}
@@ -149,49 +153,84 @@ const AddressItem = ({
   );
 };
 
-const ProductItem = ({index, price, name, selectedQuantity, priceUnit})=>{
-    return(
-        <View style={{ display: 'flex', flexDirection: 'row',justifyContent: 'space-between', marginTop: 10 }}>
-          <View style={{ display: 'flex', flexDirection: "row"}}>
-            <Text style={{ marginLeft: 10 }}>{index + 1}.</Text>
-            <Text style={{ marginLeft: 10 }}>{name.slice(0,20)}</Text>
+const ProductItem = ({
+  index,
+  price,
+  name,
+  selectedQuantity,
+  priceUnit,
+  subscription,discount
+}) => {
+  return (
+    <View
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 10,
+      }}
+    >
+      <View
+        style={{ alignItems: "center", display: "flex", flexDirection: "row" }}
+      >
+        <Text style={{ marginLeft: 10 }}>{index + 1}.</Text>
+        <Text style={{ marginLeft: 10 }}>{name.slice(0, 20)} </Text>
+        {subscription == 1 ? (
+          <View
+            style={{
+              backgroundColor: theme.backgroundColor,
+              borderRadius: 100,
+              padding: 5,
+              paddingVertical: 1
+            }}
+          >
+            <Text style={{ fontSize: 10, color: "white" }}>Subscription</Text>
           </View>
-          <View style={{ display: 'flex', flexDirection: 'row' }}>
-
-            <Text style={{ marginLeft: 10 }}>  ₹ {price * selectedQuantity},</Text>
-            <Text style={{ marginLeft: 10 }}>  Qty: {selectedQuantity + ' '+ priceUnit}</Text>
-          </View>
-        </View>
-    )
-}
+        ) : (
+          <></>
+        )}
+      </View>
+      <View style={{ display: "flex", flexDirection: "row" }}>
+        <Text style={{ marginLeft: 10 }}> ₹ {price * selectedQuantity},</Text>
+        <Text style={{ marginLeft: 10 }}>
+          {" "}
+          Qty: {selectedQuantity + " " + priceUnit}
+        </Text>
+        <Text style={{ marginLeft: 10 }}>
+          {" "}
+          Dis: ₹ {discount > 0 ? ((price/100) * discount * selectedQuantity) : 0 }
+        </Text>
+      </View>
+    </View>
+  );
+};
 
 export default function PaymentPage(props) {
   const [address, setAddress] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetchProducts, response, productsLoading, productError] = useQuery();
-    const productItem = response.data || []
+  const productItem = response.data || [];
   const [token, setToken] = useState("");
-  const [paymentMode] = useState({ paymentMode: "Cash On Delivery"})
+  const [paymentMode] = useState({ paymentMode: "Cash On Delivery" });
 
-  const generate = async () =>{
+  const generate = async () => {
     const obj = {
       address: selectedAddress,
       products: productItem,
       paymentMode: paymentMode,
-      token: await getValueFor()
-      
-    }
-    console.log(obj)
+      token: await getValueFor(),
+    };
+    console.log(obj);
 
-    try{
-      await axios.post('/order/add', obj)
-      console.warn("Success")
-      props.navigation.navigate('OrderSuccess')
-    } catch(error){
-      props.navigation.navigate('OrderFailed')
+    try {
+      await axios.post("/order/add", obj);
+      console.warn("Success");
+      props.navigation.navigate("OrderSuccess");
+    } catch (error) {
+      props.navigation.navigate("OrderFailed");
     }
-  }
+  };
 
   // const save = async () =>{
   //   // console.log()
@@ -211,10 +250,10 @@ export default function PaymentPage(props) {
         token: t && t.length > 100 ? t : token,
       });
       setAddress(respon.data);
-      setSelectedAddress(respon.data[0])
-      setLoading(false)
+      setSelectedAddress(respon.data[0]);
+      setLoading(false);
     } catch (error) {
-        setLoading(false)
+      setLoading(false);
       console.log(error);
       Alert.alert(
         "Error",
@@ -233,7 +272,7 @@ export default function PaymentPage(props) {
       );
     }
   };
-  const save = ()=> generate()
+  const save = () => generate();
   useEffect(() => {
     const unsubscribe = props.navigation.addListener("focus", async () => {
       try {
@@ -243,42 +282,61 @@ export default function PaymentPage(props) {
           props.navigation.navigate("LoginScreen");
         } else {
           getAddress(r);
-          fetchProducts('/order/cart/get')
+          fetchProducts("/order/cart/get");
         }
-      } catch (error) { 
-          console.log(error)
+      } catch (error) {
+        console.log(error);
       }
     });
     return unsubscribe;
   }, [props.navigation]);
 
-  if(loading) return <Loading />
+  if (loading) return <Loading />;
   return (
     <View style={styles.screen}>
       <ScrollView style={styles.scrollView}>
         <View style={{ marginTop: Spacing.ExtraLarge }}>
           <TextFont style={{ fontFamily: "PT_SansBold" }}>
-              Select Address
+            Select Address
           </TextFont>
           {address.map((item) => (
-            <AddressItem {...item} item={item} fetch={getAddress} selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress} />
+            <AddressItem
+              {...item}
+              item={item}
+              fetch={getAddress}
+              selectedAddress={selectedAddress}
+              setSelectedAddress={setSelectedAddress}
+            />
           ))}
         </View>
         <View style={{ marginTop: Spacing.ExtraLarge }}>
-          <TextFont style={{ fontFamily: "PT_SansBold" }}>
-              Products
-          </TextFont>
+          <TextFont style={{ fontFamily: "PT_SansBold" }}>Products</TextFont>
           {productItem.map((item, index) => (
-            <ProductItem {...item} index={index} fetch={()=> fetchProducts('/order/cart/get') } selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress} />
+            <ProductItem
+              {...item}
+              index={index}
+              fetch={() => fetchProducts("/order/cart/get")}
+              selectedAddress={selectedAddress}
+              setSelectedAddress={setSelectedAddress}
+            />
           ))}
         </View>
         <View style={{ marginTop: Spacing.ExtraLarge }}>
           <TextFont style={{ fontFamily: "PT_SansBold" }}>
-              Payment Mode
+            Payment Mode
           </TextFont>
-            <View style={{ width: 150, paddingHorizontal: 10, marginTop: 15 , paddingVertical: 10, borderRadius: 10, backgroundColor: theme.themeLight }}>
-                <Text>Cash On Delivery</Text>
-            </View>
+          <View
+            style={{
+              width: 150,
+              paddingHorizontal: 10,
+              marginTop: 15,
+              paddingVertical: 10,
+              borderRadius: 10,
+              backgroundColor: theme.themeLight,
+            }}
+          >
+            <Text>Cash On Delivery</Text>
+          </View>
           {/* {productItem.map((item, index) => (
             <ProductItem {...item} index={index} fetch={()=> fetchProducts('/order/cart/get') } selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress} />
           ))} */}
@@ -293,7 +351,9 @@ export default function PaymentPage(props) {
             alignItems: "center",
           }}
         >
-          <TextFont style={{ fontSize: 30, color: "white" }}>{productsLoading ? <ActivityIndicator /> : response.total}</TextFont>
+          <TextFont style={{ fontSize: 30, color: "white" }}>
+            {productsLoading ? <ActivityIndicator /> : response.total}
+          </TextFont>
           <View
             style={{
               display: "flex",

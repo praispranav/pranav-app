@@ -76,9 +76,9 @@ const Item = ({ item, imageState, availableQuantity }) => {
   useEffect(() => {
     setSelectedQuantity(item.initialQuantity);
   }, [item]);
-  const dis = (item.price / 100) * item.discount;
+  const dis = (item.price / 100) * (item.discount > 0 ? item.discount : 0);
   const discountedPrice = item.price - dis;
-  console.log('Discount',item.discount)
+  console.log("Discount", item.discount);
   return (
     <>
       <View
@@ -88,14 +88,36 @@ const Item = ({ item, imageState, availableQuantity }) => {
           marginVertical: Spacing.Large,
         }}
       >
-        {findImage(item._id) ? (
-          <Image
-            source={{ uri: findImage(item._id) }}
-            style={{ width: 70, height: 70, borderRadius: 5 }}
-          />
-        ) : (
-          <View style={{ width: 70, height: 70, borderRadius: 5 }} />
-        )}
+        <View style={{ position: 'relative' }}>
+          {findImage(item._id) ? (
+            <>
+              <Image
+                source={{ uri: findImage(item._id) }}
+                style={{ width: 70, height: 70, borderRadius: 5 }}
+              />
+              {item.subscription == 1 ? (
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: -10,
+                    backgroundColor: theme.backgroundColor,
+                    borderRadius: 100,
+                    padding: 5,
+                    right: 6,
+                  }}
+                >
+                  <Text style={{ fontSize: 10, color: "white" }}>
+                    Subscription
+                  </Text>
+                </View>
+              ) : (
+                <></>
+              )}
+            </>
+          ) : (
+            <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+          )}
+        </View>
         <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
           <View
             style={{
@@ -171,19 +193,24 @@ const Item = ({ item, imageState, availableQuantity }) => {
           </View>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
-              ₹ {discountedPrice}/{item.priceUnit}
+              ₹ {discountedPrice}/{item.subscription == 1 ? "month" : item.priceUnit}
             </Text>
-            <Text
-              style={{
-                fontFamily: "MPlusBold",
-                fontSize: Font.Small,
-                textDecorationLine: "line-through",
-                color: "grey",
-                marginLeft: Spacing.Normal,
-              }}
-            >
-              ₹ {item.price}/{item.priceUnit}
-            </Text>
+            {item.discount > 0 ? (
+              <Text
+                style={{
+                  fontFamily: "MPlusBold",
+                  fontSize: Font.Small,
+                  textDecorationLine: "line-through",
+                  color: "grey",
+                  marginLeft: Spacing.Normal,
+                }}
+              >
+                ₹ {item.price}/
+                {item.subscription == 1 ? "month" : item.priceUnit}
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
           <View
             style={{

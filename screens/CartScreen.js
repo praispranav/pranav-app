@@ -150,7 +150,7 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
     value: "",
   });
   const [setQuantity] = useQuery("/order/cart/edit/");
-  const [deleteLoading, setDeleteLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const getImage = async () => {
     if (imageState) return;
@@ -166,17 +166,17 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
   };
 
   const deleteItem = async () => {
-    setDeleteLoading(true)
+    setDeleteLoading(true);
     try {
       const t = await getValueFor();
-      console.warn(item._id)
+      console.warn(item._id);
       const response = await axios.post("/order/cart/delete", {
         token: t,
         _id: item._id,
       });
-      setDeleteLoading(false)
-      setCalculate()
-      console.warn(response.data)
+      setDeleteLoading(false);
+      setCalculate();
+      console.warn(response.data);
       // Alert.alert(
       //   "Error",
       //   response.data.message,
@@ -191,8 +191,8 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
       //   }
       // );
     } catch (error) {
-      console.log(error)
-      setDeleteLoading(false)
+      console.log(error);
+      setDeleteLoading(false);
       Alert.alert(
         "Error",
         "Something Went Wrong.",
@@ -206,8 +206,8 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
           cancelable: true,
         }
       );
-    } finally{
-      console.log("Ended")
+    } finally {
+      console.log("Ended");
     }
   };
 
@@ -222,14 +222,14 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
     getImage();
     setSelectedQuantity({ label: "", value: item.selectedQuantity });
   }, [item.selectedQuantity]);
-  const dis = (item.price / 100) * item.discount;
+  const dis = (item.price / 100) * (item.discount > 0 ? item.discount : 0);
   const discountedPrice = item.price - dis;
   return (
     <View
       style={{
         display: "flex",
         flexDirection: "row",
-        marginVertical: Spacing.Large,
+        marginVertical: Spacing.ExtraLarge,
       }}
     >
       <View style={{ position: "absolute", right: 0, top: 5 }}>
@@ -240,8 +240,7 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
             justifyContent: "center",
             alignItems: "center",
             height: 20,
-            backgroundColor:
-              theme.redLight,
+            backgroundColor: theme.redLight,
             marginRight: Spacing.ExtraSmall,
             borderRadius: 100,
             paddingHorizontal: Spacing.Small,
@@ -257,14 +256,56 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
           </Text>
         </TouchableOpacity>
       </View>
-      {imageState ? (
-        <Image
-          source={{ uri: imageState }}
-          style={{ width: 70, height: 70, borderRadius: 5 }}
-        />
-      ) : (
-        <View style={{ width: 70, height: 70, borderRadius: 5 }} />
-      )}
+      <View style={{ position: "relative" }}>
+        {imageState ? (
+          <>
+            <Image
+              source={{ uri: imageState }}
+              style={{ width: 70, height: 70, borderRadius: 5 }}
+            />
+            {item.subscription == 1 ? (
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: -10,
+                  backgroundColor: theme.backgroundColor,
+                  borderRadius: 100,
+                  padding: 5,
+                  right: 6,
+                }}
+              >
+                <Text style={{ fontSize: 10, color: "white" }}>
+                  Subscription
+                </Text>
+              </View>
+            ) : (
+              <></>
+            )}
+            {
+              <View
+                style={{
+                  position: "absolute",
+                  top: -22,
+                  backgroundColor: "white",
+                  borderRadius: 100,
+                  padding: 5,
+                  right: 12,
+                  width: 50,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: 10, color: "black" }}>
+                  ₹ {discountedPrice * item.selectedQuantity}
+                </Text>
+              </View>
+            }
+          </>
+        ) : (
+          <View style={{ width: 70, height: 70, borderRadius: 5 }} />
+        )}
+      </View>
       <View style={{ marginLeft: Spacing.Medium, width: "74%" }}>
         <View
           style={{
@@ -289,19 +330,24 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
         </View>
         <View style={{ display: "flex", flexDirection: "row" }}>
           <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
-            ₹ {discountedPrice}/{item.priceUnit}
+            ₹ {discountedPrice}/
+            {item.subscription == 1 ? "month" : item.priceUnit}
           </Text>
-          <Text
-            style={{
-              fontFamily: "MPlusBold",
-              fontSize: Font.Small,
-              textDecorationLine: "line-through",
-              color: "grey",
-              marginLeft: Spacing.Normal,
-            }}
-          >
-            ₹ {item.price}/{item.priceUnit}
-          </Text>
+          {item.discount > 0 ? (
+            <Text
+              style={{
+                fontFamily: "MPlusBold",
+                fontSize: Font.Small,
+                textDecorationLine: "line-through",
+                color: "grey",
+                marginLeft: Spacing.Normal,
+              }}
+            >
+              ₹ {item.price}/{item.subscription == 1 ? "month" : item.priceUnit}
+            </Text>
+          ) : (
+            <></>
+          )}
         </View>
         <View
           style={{
@@ -479,21 +525,6 @@ export default function CartScreen({ navigation }) {
     <View style={styles.screen}>
       <ScrollView style={styles.scrollView}>
         <View>
-          <Text
-            style={{
-              fontFamily: "MPlusBold",
-              marginVertical: Spacing.Large,
-              fontSize: Font.Large,
-            }}
-          >
-            Subscriptions
-          </Text>
-        </View>
-        {console.log("responseData", response)}
-        <View>
-          <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Large }}>
-            Products
-          </Text>
           {products.map((item, itemIndex) => {
             const availableQuantity = item.availableQuantity.map((i, index) => {
               const newObj = new Object();

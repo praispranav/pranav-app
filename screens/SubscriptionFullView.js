@@ -6,14 +6,36 @@ import {
   Text,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Spacing } from "../constants/MarginPadding";
 import { Font } from "../constants/Fonts";
 import theme from "../config/theme";
 import moment from "moment";
 import TextFont from "../elements/Text";
+import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+import Input from "../components/TextInput";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const styles = StyleSheet.create({
+  badge: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    height: 20,
+    borderRadius: 50,
+    backgroundColor: theme.backgroundColor,
+    width: 60,
+    right: 0,
+    position: "absolute",
+    top: 25,
+  },
   screen: {
     flex: 1,
     paddingHorizontal: Spacing.Normal,
@@ -51,34 +73,127 @@ const d = {
   endDate: new Date(),
   deliveryTimeRange: ["7pm - 8pm"],
   days: ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"],
-  deliveries:[
-      {
-          comment:'',
-          status: "Delivered",
-          deliveryDate: new Date(),
-            quantity: "69"
-      }
-  ]
+  deliveries: [
+    {
+      comment: "",
+      status: "Delivered",
+      deliveryDate: new Date(),
+      quantity: "69",
+    },
+  ],
 };
 const days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"];
 
-const timeRanges = [
-  "8pm - 9pm",
-  "7pm - 8pm",
-  "6pm - 7pm",
-  "5pm - 6pm",
-  "6am - 7am",
-  "7am - 8am",
-  "8am - 9am",
-];
+// const timeRanges = [
+//   "8pm - 9pm",
+//   "7pm - 8pm",
+//   "6pm - 7pm",
+//   "5pm - 6pm",
+//   "6am - 7am",
+//   "7am - 8am",
+//   "8am - 9am",
+// ];
 
-export default function SubscriptionDetails() {
+function getValueFor(key) {
+  return new Promise(async (resolve, rejects) => {
+    let result = await SecureStore.getItemAsync("token");
+    if (result) {
+      resolve(result);
+    } else {
+      rejects("");
+    }
+  });
+}
+
+const LoadingIndicator = ({ loadingState, text }) => {
+  if (loadingState) return <ActivityIndicator color={"white"} />;
+  return <Text style={{ color: "white" }}>{text}</Text>;
+};
+
+const INITIAL_LOADING = {
+  extraQuantity: false,
+  cancelDelivery: false,
+  extraQuantityError: false,
+  cancelError: false,
+};
+
+export default function SubscriptionDetails({ navigation, route }) {
+  const { data: itemData } = route.params;
+  const subscriptionInfo = JSON.parse(itemData);
+
+  const [datePickerState, setDatePickerState] = useState({
+    cancel: false,
+    extra: false,
+  });
+
+  const [cancelState, setCancelState] = useState({
+    token: "",
+    date: new Date(),
+    comment: "",
+  });
+  const [extraState, setExtraState] = useState({
+    token: "",
+    date: new Date(),
+    quantity: "",
+  });
+
+  const [loading, setLoading] = useState(INITIAL_LOADING);
+
   const [changesUpdate, setChangesUpdate] = useState(false);
+  const [timeRanges, setTimeRange] = useState([]);
+  const [token, setToken] = useState("");
 
   const [daysUpdated, setDaysUpdates] = useState(false);
   const [timeRangeUpdate, setTimeRangeUpdate] = useState(false);
 
+  const [details, setDetails] = useState({
+    cancelled: [],
+    extra: [],
+    deliveries: [],
+  });
+
   const [data, setData] = useState(d);
+
+  const fetchTimeRange = async () => {
+    try {
+      const { data } = await axios.get("/category/time-range");
+      setTimeRange(data);
+    } catch (err) {}
+  };
+
+  const fetchExtraQuantity = async () => {
+    try {
+      const { data } = await axios.post("/order/subscription/extra/get", {
+        token: await getValueFor(),
+        subscriptionId: subscriptionInfo._id,
+      });
+      setDetails((prevState) => ({ ...prevState, extra: data }));
+    } catch (err) {}
+  };
+
+  const fetchCancelledQuantity = async () => {
+    try {
+      const { data } = await axios.post("/order/subscription/cancel/date/get", {
+        token: await getValueFor(),
+        subscriptionId: subscriptionInfo._id,
+      });
+      setDetails((prevState) => ({ ...prevState, cancelled: data }));
+    } catch (err) {}
+  };
+
+  const fetchDeliveries = async () => {
+    try {
+      const { data } = await axios.post("/order/subscription/delivery/get", {
+        token: await getValueFor(),
+        subscriptionId: subscriptionInfo._id,
+      });
+      setDetails((prevState) => ({ ...prevState, deliveries: data }));
+    } catch (err) {}
+  };
+  async function getToken() {
+    const t = await getValueFor();
+    setToken(t);
+  }
 
   const getBackgroundColor = (status) => {
     status = status.toLowerCase();
@@ -86,7 +201,7 @@ export default function SubscriptionDetails() {
   };
 
   const checkDays = (currentDay) => {
-    const a = data.days.findIndex((dayCh) => dayCh === currentDay);
+    const a = subscriptionInfo.days.findIndex((dayCh) => dayCh === currentDay);
     if (a !== -1) return true;
     return false;
   };
@@ -113,20 +228,103 @@ export default function SubscriptionDetails() {
     setDaysUpdates(false);
   };
 
-  const discardDeliveryTime =() =>{
-      const dataCopy = { ...data,deliveryTimeRange: d.deliveryTimeRange }
-      setData(dataCopy)
-  }
+  const discardDeliveryTime = () => {
+    const dataCopy = { ...data, deliveryTimeRange: d.deliveryTimeRange };
+    setData(dataCopy);
+  };
 
-  const onChangeTimeRange = (value) =>{
-    setTimeRangeUpdate(true)
-    const dataCopy = { ...data, deliveryTimeRange: [value]  }
-    setData(dataCopy)
-  }
-  
-  useEffect(()=>{
-    setData(d)
-  },[])
+  const onChangeTimeRange = (value) => {
+    setTimeRangeUpdate(true);
+    const dataCopy = { ...data, deliveryTimeRange: [value] };
+    setData(dataCopy);
+  };
+
+  const handleCancelDatePicker = (e) => {
+    setDatePickerState({ extra: false, cancel: false });
+    setCancelState((prevState) => ({
+      ...prevState,
+      date: e.nativeEvent.timestamp,
+      token: token,
+    }));
+    console.warn(cancelState, "Cancel");
+  };
+
+  const handleExtraDatePicker = (e) => {
+    setDatePickerState({ extra: false, cancel: false });
+    console.warn(e);
+    setExtraState((prevState) => ({
+      ...prevState,
+      token: token,
+      date: e.nativeEvent.timestamp,
+    }));
+  };
+
+  const submitCancel = async () => {
+    setLoading((prevState) => ({ ...prevState, cancelDelivery: true }));
+    try {
+      await axios.post("/order/subscription/cancel/date", {
+        ...cancelState,
+        subscriptionId: subscriptionInfo._id,
+        token: await getValueFor(),
+      });
+      Alert.alert("Success", "Cancel Request Submitted");
+      setCancelState({
+        token: "",
+        date: new Date(),
+        comment: "",
+      });
+      fetchCancelledQuantity()
+      setLoading((prevState) => ({ ...prevState, cancelDelivery: false }));
+    } catch {
+      setLoading((prevState) => ({
+        ...prevState,
+        cancelDelivery: false,
+        cancelError: true,
+      }));
+    }
+    console.log("Cancel State", cancelState);
+  };
+
+  const submitExtra = async () => {
+    console.log("ExtraState", extraState);
+    setLoading((prevState) => ({ ...prevState, extraQuantity: true }));
+    try {
+      await axios.post("/order/subscription/extra/create", {
+        ...extraState,
+        subscriptionId: subscriptionInfo._id,
+        token: await getValueFor(),
+      });
+      Alert.alert("Success", "Quantity Extended");
+      setLoading((prevState) => ({ ...prevState, extraQuantity: false }));
+      fetchExtraQuantity()
+    } catch {
+      setLoading((prevState) => ({
+        ...prevState,
+        extraQuantity: false,
+        extraQuantityError: true,
+      }));
+    }
+  };
+
+  const showExtraDatePicker = () =>
+    setDatePickerState((prevState) => ({
+      ...prevState,
+      extra: !prevState.extra,
+    }));
+  const showCancelDatePicker = () =>
+    setDatePickerState((prevState) => ({
+      ...prevState,
+      extra: !prevState.extra,
+    }));
+
+  useEffect(() => {
+    getToken();
+    fetchTimeRange();
+    fetchExtraQuantity()
+    fetchCancelledQuantity();
+    fetchDeliveries()
+    setData(d);
+  }, []);
 
   return (
     <ScrollView style={styles.screen}>
@@ -140,7 +338,7 @@ export default function SubscriptionDetails() {
           <Image source={data.image} style={styles.img} />
           <View style={{ marginLeft: Spacing.Normal }}>
             <Text style={{ fontSize: 18, fontFamily: "MPlusBold" }}>
-              {data.name}
+              {subscriptionInfo.name}
             </Text>
             <View style={[styles.flex, { marginTop: 5 }]}>
               <Text
@@ -149,20 +347,23 @@ export default function SubscriptionDetails() {
                 Order Date:
               </Text>
               <TextFont style={{ fontSize: Font.PrimarySmall }}>
-                {moment(data.startDate).format("YYYY-MM-DD")}
+                {moment(subscriptionInfo.createdDate).format("YYYY-MM-DD")}
               </TextFont>
             </View>
-            <View style={[styles.flex, { marginTop: Spacing.ExtraSmall }]}>
+            <View style={[styles.flex, { marginTop: 5 }]}>
               <Text
                 style={{ fontSize: Font.PrimarySmall, fontFamily: "MPlusBold" }}
               >
                 End Date:
               </Text>
               <TextFont style={{ fontSize: Font.PrimarySmall }}>
-                {moment(data.endDate).format("YYYY-MM-DD")}
+                {moment(subscriptionInfo.createdDate).add(30,'d').format("YYYY-MM-DD")}
               </TextFont>
             </View>
           </View>
+            <View style={{ position: 'absolute', right: 0, top: 10 }}>
+              <Text>{subscriptionInfo.selectedQuantity * 30 } {subscriptionInfo.priceUnit + '  total'}</Text>
+            </View>
         </View>
 
         <View style={{ marginTop: Spacing.Normal }}>
@@ -251,36 +452,43 @@ export default function SubscriptionDetails() {
           </Text>
 
           <View style={[styles.flex, { flexWrap: "wrap" }]}>
-            {timeRanges.map((day) => (
-              <TouchableOpacity
-                onPress={() => onChangeTimeRange(day)}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingHorizontal: 5,
-                  height: 20,
-                  borderRadius: 50,
-                  backgroundColor:
-                    day == data.deliveryTimeRange[0]
-                      ? theme.backgroundColor
-                      : theme.lightgrey,
-                  marginTop: Spacing.Medium,
-                  marginRight: Spacing.Small,
-                }}
-              >
-                <Text
+            {timeRanges.length ? (
+              timeRanges.map((day) => (
+                <TouchableOpacity
+                  onPress={() => onChangeTimeRange(day)}
                   style={{
-                    color: day == data.deliveryTimeRange[0] ? "white" : "black",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingHorizontal: 5,
+                    height: 20,
+                    borderRadius: 50,
+                    backgroundColor:
+                      day == data.deliveryTimeRange[0]
+                        ? theme.backgroundColor
+                        : theme.lightgrey,
+                    marginTop: Spacing.Medium,
+                    marginRight: Spacing.Small,
                   }}
                 >
+                  <Text
+                    style={{
+                      color:
+                        day == data.deliveryTimeRange[0] ? "white" : "black",
+                    }}
+                  >
                     {console.log(day, data.deliveryTimeRange[0])}
-                  {day}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                    {day}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <>
+                <ActivityIndicator color={theme.backgroundColor} />
+              </>
+            )}
           </View>
           {timeRangeUpdate && (
             <View
@@ -328,7 +536,191 @@ export default function SubscriptionDetails() {
             </View>
           )}
         </View>
+        <View style={{ marginTop: Spacing.Large }}>
+          <Text
+            style={{
+              fontSize: Font.Primary,
+              fontFamily: "MPlusBold",
+              position: "relative",
+            }}
+          >
+            Extra Quantity
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginTop: Spacing.Normal,
+              alignItems: "center",
+              marginLeft: Spacing.Large,
+              justifyContent: "space-between",
+              width: "50%",
+            }}
+          >
+            <Text>Selected Date</Text>
+            <AntDesign
+              name="calendar"
+              onPress={showExtraDatePicker}
+              size={25}
+            />
+          </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginTop: Spacing.Normal,
+              alignItems: "center",
+              marginLeft: Spacing.Large,
+              justifyContent: "space-between",
+              width: "50%",
+            }}
+          >
+            <Text>Quantity</Text>
+            <Input
+              onChangeText={(e) =>
+                setExtraState((prevState) => ({ ...prevState, quantity: e }))
+              }
+              placeholder={"Extra Quantity"}
+              inputStyle={{ marginLeft: Spacing.Large }}
+            />
+          </View>
+          <TouchableOpacity onPress={submitExtra} style={styles.badge}>
+            <LoadingIndicator
+              loadingState={loading.extraQuantity}
+              text={"Submit"}
+            />
+          </TouchableOpacity>
+        </View>
+        {datePickerState.cancel && (
+          <DateTimePicker
+            value={new Date()}
+            mode="date"
+            display="default"
+            onChange={(e) => handleCancelDatePicker(e)}
+          />
+        )}
+        {datePickerState.extra && (
+          <DateTimePicker
+            value={new Date()}
+            mode="date"
+            display="default"
+            onChange={(e) => handleExtraDatePicker(e)}
+          />
+        )}
+        <View style={{ marginTop: Spacing.Large }}>
+          <Text
+            style={{
+              fontSize: Font.Primary,
+              fontFamily: "MPlusBold",
+              position: "relative",
+            }}
+          >
+            Cancel Delivery
+          </Text>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginTop: Spacing.Normal,
+              alignItems: "center",
+              marginLeft: Spacing.Large,
+              justifyContent: "space-between",
+              width: "50%",
+            }}
+          >
+            <Text>Selected Date</Text>
+            <AntDesign
+              name="calendar"
+              onPress={showCancelDatePicker}
+              size={25}
+            />
+          </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              marginTop: Spacing.Normal,
+              alignItems: "center",
+              marginLeft: Spacing.Large,
+              justifyContent: "space-between",
+              width: "50%",
+            }}
+          >
+            <Text>Reason</Text>
+            <Input
+              placeholder={"Reason Optional"}
+              inputStyle={{ marginLeft: Spacing.Large }}
+              onChangeText={(e) =>
+                setCancelState((prevState) => ({ ...prevState, comment: e }))
+              }
+            />
+          </View>
+          <TouchableOpacity onPress={submitCancel} style={styles.badge}>
+            <LoadingIndicator
+              loadingState={loading.cancelDelivery}
+              text={"Submit"}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={{ marginTop: Spacing.Large }}>
+        <Text
+            style={{
+              fontSize: Font.Primary,
+              fontFamily: "MPlusBold",
+              position: "relative",
+            }}
+          >
+            Cancel Requests
+          </Text>
+          <View style={{margin:Spacing.Normal}}>
+          {
+            details.cancelled.map((item, index)=>(
+              <View style={{ display: "flex", marginBottom: 8, paddingHorizontal: 10, borderRadius: 8, flexDirection: "row",  justifyContent: 'space-between' }}>
+                <Text style={{ width: 35 }}>{index + 1}.</Text>
+                <Text style={{ width: 75 }}>{moment(item.date).format('YYYY-MM-DD')}</Text>
+                <Text style={{ width: 55 }}>{item.comment.slice(0,20)}</Text>
+              </View>
+            ))
+          }
 
+          </View>
+        </View>
+         <View style={{ marginTop: Spacing.Large }}>
+        <Text
+            style={{
+              fontSize: Font.Primary,
+              fontFamily: "MPlusBold",
+              position: "relative",
+            }}
+          >
+            Extra Quantity Requests
+          </Text>
+          {
+            details.extra.map((item, index)=>(
+              <View style={{ display: "flex", marginBottom: 8, paddingHorizontal: 10, borderRadius: 8, flexDirection: "row",  justifyContent: 'space-between' }}>
+                <Text style={{ width: 30}}>{index + 1}.</Text>
+                <Text style={{ width: 75}}>{moment(item.date).format('YYYY-MM-DD')}</Text>
+                <Text style={{ width: 50}}>{item.quantity}</Text>
+              </View>
+            ))
+          }
+        </View>
+      {/*  <View style={{ marginTop: Spacing.Large }}>
+        <Text
+            style={{
+              fontSize: Font.Primary,
+              fontFamily: "MPlusBold",
+              position: "relative",
+            }}
+          >
+            Cancel Delivery
+          </Text>
+          {
+            details.cancelled.map((item)=>(
+
+            ))
+          } */}
+        {/* </View> */}
       </View>
     </ScrollView>
   );

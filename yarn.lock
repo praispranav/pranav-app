@@ -1348,6 +1348,13 @@
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
 
+"@react-native-community/datetimepicker@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-3.5.2.tgz#8e6feb30f2620e5abdf565d5fe74c0c04edcf6ae"
+  integrity sha512-TWRuAtr/DnrEcRewqvXMLea2oB+YF+SbtuYLHguALLxNJQLl/RFB7aTNZeF+OoH75zKFqtXECXV1/uxQUpA+sg==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native/assets@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@react-native/assets/-/assets-1.0.0.tgz#c6f9bf63d274bafc8e970628de24986b30a55c8e"
@@ -4600,10 +4607,10 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
-react-native-calendars@^1.1269.0:
-  version "1.1269.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.1269.0.tgz#3692e5a1cf82a0f4efc89ab4ca63fa62224ad41f"
-  integrity sha512-jlltWzJXcjxigRrDcgR/aEiEqo0+z1cpkxZRlNiAw2TyRmw4wRtwGVGJFs2Bp63tQrXLh3Hm4nTjGvtSR4zwEg==
+react-native-calendars@^1.1271.0:
+  version "1.1271.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.1271.0.tgz#2e833805d7e2bb025456fff2cfcc94653308e68c"
+  integrity sha512-4GSdF/K0I6SlEXf1VLu2CBnV5HOrWwH841jMMditha3q1nMufDgs3SlZBB6z8ZputWBXpOTpZLRh55qU2uYjRA==
   dependencies:
     hoist-non-react-statics "^3.3.1"
     immutable "^4.0.0-rc.12"
