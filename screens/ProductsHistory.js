@@ -118,9 +118,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const Item = ({ item, getBadgeColor, getBackgroundColor }) => {
+const Item = ({ item, getBadgeColor, getBackgroundColor, reload }) => {
   const [imageState, setImageState] = useState(false);
-  const [fetch, state, loading] = useHistory();
+  const [fetch, state, loading] = useHistory(reload);
 
   const getImage = async () => {
     console.log(item.productId);
@@ -251,6 +251,7 @@ export default function ProductHistory({ navigation }) {
           return (
             <Item
               item={item}
+              reload={()=> http({ type: "fetch", body: "" })}
               getBadgeColor={getBadgeColor}
               getBackgroundColor={getBackgroundColor}
             />

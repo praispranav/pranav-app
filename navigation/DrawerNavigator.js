@@ -124,12 +124,12 @@ import AccountScreen from "../screens/AccountScreen";
 import Loading from "../components/Loading";
 
 
+const removeTOken = async ()=>{
+  await SecureStore.deleteItemAsync('token')
+  // navigation.navigate('LoginScreen')
+}
 
 const LogOutScreen =({ navigation })=>{
-  const removeTOken = async ()=>{
-    await SecureStore.deleteItemAsync('token')
-    navigation.navigate('LoginScreen')
-  }
   React.useEffect(()=>{
     removeTOken()
   },[navigation])

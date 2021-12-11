@@ -16,7 +16,7 @@ function getValueFor(key) {
   });
 }
 
-export function useHistory() {
+export function useHistory( callback ) {
   const [loading, setLoading] = useState(false);
   const [state, setState] = useState([])
   const fetch = async ({ type, body: Payload }) => {
@@ -33,6 +33,7 @@ export function useHistory() {
       });
       setLoading(false);
       setState(response.data)
+      if(callback) callback()
 
     } catch (error) {
       console.log(error);
