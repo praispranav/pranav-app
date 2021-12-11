@@ -454,7 +454,7 @@ export default function App({ navigation, route }) {
       <Drawer.Screen
         options={({ navigation }) => {
           return {
-            title: "Dairy Products",
+            title: "Cart",
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (

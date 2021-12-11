@@ -62,13 +62,13 @@ export default function LoginScreen(props) {
         [
           {
             text: "OK",
-            onPress: () => props.navigation.navigate("HomeScreen"),
+            onPress: () => props.navigation.navigate("Drawer"),
             style: "cancel",
           },
         ],
         {
           cancelable: true,
-          onDismiss: () => props.navigation.navigate("HomeScreen"),
+          onDismiss: () => props.navigation.navigate("Drawer"),
         }
       );
       setLoading(false);
@@ -81,13 +81,11 @@ export default function LoginScreen(props) {
         [
           {
             text: "OK",
-            onPress: () => props.navigation.navigate("LoginScreen"),
             style: "cancel",
           },
         ],
         {
           cancelable: true,
-          onDismiss: () => props.navigation.navigate("HomeScreen"),
         }
       );
       console.warn(error);
