@@ -82,7 +82,7 @@ const d = {
     },
   ],
 };
-const days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"];
+const allDays = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"];
 
 // const timeRanges = [
 //   "8pm - 9pm",
@@ -152,6 +152,11 @@ export default function SubscriptionDetails({ navigation, route }) {
     deliveries: [],
   });
 
+  const [days, setDays] = useState([]);
+  const [deliveryTimeRange, setDeliveryTimeRange] = useState("");
+
+  const [deliveries, setDeliveries] = useState([]);
+
   const [data, setData] = useState(d);
 
   const fetchTimeRange = async () => {
@@ -187,9 +192,30 @@ export default function SubscriptionDetails({ navigation, route }) {
         token: await getValueFor(),
         subscriptionId: subscriptionInfo._id,
       });
-      setDetails((prevState) => ({ ...prevState, deliveries: data }));
+      setDeliveries(data || []);
     } catch (err) {}
   };
+
+  const updateTimeInterval = async (value) => {
+    try {
+      await axios.post("/order/subscription/edit/time-range", {
+        token: await getValueFor(),
+        subscriptionId: subscriptionInfo._id,
+        deliveryTimeRange: value,
+      });
+    } catch (err) {}
+  };
+
+  const updateDays = async (value) => {
+    try {
+      await axios.post("/order/subscription/edit/days", {
+        token: await getValueFor(),
+        subscriptionId: subscriptionInfo._id,
+        days: days,
+      });
+    } catch (err) {}
+  };
+
   async function getToken() {
     const t = await getValueFor();
     setToken(t);
@@ -201,23 +227,22 @@ export default function SubscriptionDetails({ navigation, route }) {
   };
 
   const checkDays = (currentDay) => {
-    const a = subscriptionInfo.days.findIndex((dayCh) => dayCh === currentDay);
+    const a = days.findIndex((dayCh) => dayCh === currentDay);
     if (a !== -1) return true;
     return false;
   };
 
   const handleDaySelector = (value) => {
-    const dayCopy = [...data.days];
-    const index = data.days.findIndex(
+    const dayCopy = [...days];
+    const index = days.findIndex(
       (item) => item.toLowerCase() === value.toLowerCase()
     );
     if (index === -1) {
-      const newData = { ...data, days: [...dayCopy, value] };
-      setData(newData);
+      const newData = [...dayCopy, value];
+      setDays(newData);
     } else {
       dayCopy.splice(index, 1);
-      const newData = { ...data, days: dayCopy };
-      setData(newData);
+      setDays(dayCopy);
     }
     setDaysUpdates(true);
   };
@@ -226,6 +251,7 @@ export default function SubscriptionDetails({ navigation, route }) {
     const dataCopy = { ...data, days: d.days };
     setData(dataCopy);
     setDaysUpdates(false);
+    updateDays(value);
   };
 
   const discardDeliveryTime = () => {
@@ -234,9 +260,8 @@ export default function SubscriptionDetails({ navigation, route }) {
   };
 
   const onChangeTimeRange = (value) => {
-    setTimeRangeUpdate(true);
-    const dataCopy = { ...data, deliveryTimeRange: [value] };
-    setData(dataCopy);
+    setDeliveryTimeRange(value);
+    updateTimeInterval(value);
   };
 
   const handleCancelDatePicker = (e) => {
@@ -273,7 +298,7 @@ export default function SubscriptionDetails({ navigation, route }) {
         date: new Date(),
         comment: "",
       });
-      fetchCancelledQuantity()
+      fetchCancelledQuantity();
       setLoading((prevState) => ({ ...prevState, cancelDelivery: false }));
     } catch {
       setLoading((prevState) => ({
@@ -282,7 +307,6 @@ export default function SubscriptionDetails({ navigation, route }) {
         cancelError: true,
       }));
     }
-    console.log("Cancel State", cancelState);
   };
 
   const submitExtra = async () => {
@@ -296,7 +320,7 @@ export default function SubscriptionDetails({ navigation, route }) {
       });
       Alert.alert("Success", "Quantity Extended");
       setLoading((prevState) => ({ ...prevState, extraQuantity: false }));
-      fetchExtraQuantity()
+      fetchExtraQuantity();
     } catch {
       setLoading((prevState) => ({
         ...prevState,
@@ -320,10 +344,12 @@ export default function SubscriptionDetails({ navigation, route }) {
   useEffect(() => {
     getToken();
     fetchTimeRange();
-    fetchExtraQuantity()
+    fetchExtraQuantity();
     fetchCancelledQuantity();
-    fetchDeliveries()
+    fetchDeliveries();
     setData(d);
+    setDays(subscriptionInfo.days);
+    setDeliveryTimeRange(subscriptionInfo.deliveryTimeRange || "");
   }, []);
 
   return (
@@ -357,13 +383,18 @@ export default function SubscriptionDetails({ navigation, route }) {
                 End Date:
               </Text>
               <TextFont style={{ fontSize: Font.PrimarySmall }}>
-                {moment(subscriptionInfo.createdDate).add(30,'d').format("YYYY-MM-DD")}
+                {moment(subscriptionInfo.createdDate)
+                  .add(30, "d")
+                  .format("YYYY-MM-DD")}
               </TextFont>
             </View>
           </View>
-            <View style={{ position: 'absolute', right: 0, top: 10 }}>
-              <Text>{subscriptionInfo.selectedQuantity * 30 } {subscriptionInfo.priceUnit + '  total'}</Text>
-            </View>
+          <View style={{ position: "absolute", right: 0, top: 10 }}>
+            <Text>
+              {subscriptionInfo.selectedQuantity * 30}{" "}
+              {subscriptionInfo.priceUnit + "  total"}
+            </Text>
+          </View>
         </View>
 
         <View style={{ marginTop: Spacing.Normal }}>
@@ -377,7 +408,7 @@ export default function SubscriptionDetails({ navigation, route }) {
               { justifyContent: "space-between", marginTop: Spacing.Normal },
             ]}
           >
-            {days.map((day) => (
+            {allDays.map((day) => (
               <TouchableOpacity
                 onPress={() => handleDaySelector(day)}
                 style={{
@@ -427,7 +458,7 @@ export default function SubscriptionDetails({ navigation, route }) {
                 <Text style={{ color: "black" }}>{"Cancel"}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                //   onPress={() => handleDaySelector(day)}
+                onPress={() => updateDays()}
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -466,7 +497,7 @@ export default function SubscriptionDetails({ navigation, route }) {
                     height: 20,
                     borderRadius: 50,
                     backgroundColor:
-                      day == data.deliveryTimeRange[0]
+                      day == deliveryTimeRange
                         ? theme.backgroundColor
                         : theme.lightgrey,
                     marginTop: Spacing.Medium,
@@ -475,11 +506,9 @@ export default function SubscriptionDetails({ navigation, route }) {
                 >
                   <Text
                     style={{
-                      color:
-                        day == data.deliveryTimeRange[0] ? "white" : "black",
+                      color: day == deliveryTimeRange ? "white" : "black",
                     }}
                   >
-                    {console.log(day, data.deliveryTimeRange[0])}
                     {day}
                   </Text>
                 </TouchableOpacity>
@@ -663,7 +692,7 @@ export default function SubscriptionDetails({ navigation, route }) {
           </TouchableOpacity>
         </View>
         <View style={{ marginTop: Spacing.Large }}>
-        <Text
+          <Text
             style={{
               fontSize: Font.Primary,
               fontFamily: "MPlusBold",
@@ -672,21 +701,29 @@ export default function SubscriptionDetails({ navigation, route }) {
           >
             Cancel Requests
           </Text>
-          <View style={{margin:Spacing.Normal}}>
-          {
-            details.cancelled.map((item, index)=>(
-              <View style={{ display: "flex", marginBottom: 8, paddingHorizontal: 10, borderRadius: 8, flexDirection: "row",  justifyContent: 'space-between' }}>
+          <View style={{ margin: Spacing.Normal }}>
+            {details.cancelled.map((item, index) => (
+              <View
+                style={{
+                  display: "flex",
+                  marginBottom: 8,
+                  paddingHorizontal: 10,
+                  borderRadius: 8,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Text style={{ width: 35 }}>{index + 1}.</Text>
-                <Text style={{ width: 75 }}>{moment(item.date).format('YYYY-MM-DD')}</Text>
-                <Text style={{ width: 55 }}>{item.comment.slice(0,20)}</Text>
+                <Text style={{ width: 75 }}>
+                  {moment(item.date).format("YYYY-MM-DD")}
+                </Text>
+                <Text style={{ width: 55 }}>{item.comment.slice(0, 20)}</Text>
               </View>
-            ))
-          }
-
+            ))}
           </View>
         </View>
-         <View style={{ marginTop: Spacing.Large }}>
-        <Text
+        <View style={{ marginTop: Spacing.Large }}>
+          <Text
             style={{
               fontSize: Font.Primary,
               fontFamily: "MPlusBold",
@@ -695,32 +732,60 @@ export default function SubscriptionDetails({ navigation, route }) {
           >
             Extra Quantity Requests
           </Text>
-          {
-            details.extra.map((item, index)=>(
-              <View style={{ display: "flex", marginBottom: 8, paddingHorizontal: 10, borderRadius: 8, flexDirection: "row",  justifyContent: 'space-between' }}>
-                <Text style={{ width: 30}}>{index + 1}.</Text>
-                <Text style={{ width: 75}}>{moment(item.date).format('YYYY-MM-DD')}</Text>
-                <Text style={{ width: 50}}>{item.quantity}</Text>
-              </View>
-            ))
-          }
+          {details.extra.map((item, index) => (
+            <View
+              style={{
+                display: "flex",
+                marginBottom: 8,
+                paddingHorizontal: 10,
+                borderRadius: 8,
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ width: 30 }}>{index + 1}.</Text>
+              <Text style={{ width: 75 }}>
+                {moment(item.date).format("YYYY-MM-DD")}
+              </Text>
+              <Text style={{ width: 50 }}>{item.quantity}</Text>
+            </View>
+          ))}
         </View>
-      {/*  <View style={{ marginTop: Spacing.Large }}>
-        <Text
+        <View style={{ marginTop: Spacing.Large }}>
+          <Text
             style={{
               fontSize: Font.Primary,
               fontFamily: "MPlusBold",
               position: "relative",
             }}
           >
-            Cancel Delivery
+            Deliveries
           </Text>
-          {
-            details.cancelled.map((item)=>(
-
-            ))
-          } */}
-        {/* </View> */}
+          {deliveries.map((item) => (
+            <View style={{ borderWidth: 1, borderColor: "grey" }}>
+              <View
+                style={{
+                  display: "flex",
+                  marginBottom: 8,
+                  paddingHorizontal: 10,
+                  borderRadius: 8,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ width: 30 }}>{index + 1}.</Text>
+                <Text style={{ width: 75 }}>
+                  {moment(item.deliveryDate).format("YYYY-MM-DD")}
+                </Text>
+                <Text style={{ width: 50 }}>{item.quantity}</Text>
+                <Text style={{ width: 50 }}>{item.status}</Text>
+              </View>
+              <View>
+                <Text>{item.comment}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );

@@ -70,10 +70,12 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
         }}
       >
         {findImage(item._id) ? (
-          <Image
-            source={{ uri: findImage(item._id) }}
-            style={{ width: 70, height: 70, borderRadius: 5 }}
-          />
+          <>
+            <Image
+              source={{ uri: findImage(item._id) }}
+              style={{ width: 70, height: 70, borderRadius: 5 }}
+            />
+          </>
         ) : (
           <View style={{ width: 70, height: 70, borderRadius: 5 }} />
         )}
@@ -96,7 +98,7 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
               {item.name}
             </Text>
             {item.status.toLowerCase() === "available" ? (
-              <TouchableOpacity
+              <TouchableOpacity onPress={()=> addItemToCart(item._id, '1')}
                 style={{
                   borderRadius: 5,
                   backgroundColor: theme.backgroundColor,
@@ -150,17 +152,21 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
             <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
               ₹ {discountedPrice}/{item.priceUnit}
             </Text>
-            <Text
-              style={{
-                fontFamily: "MPlusBold",
-                fontSize: Font.Small,
-                textDecorationLine: "line-through",
-                color: "grey",
-                marginLeft: Spacing.Normal,
-              }}
-            >
-              ₹ {item.price}/{item.priceUnit}
-            </Text>
+            {item.discount > 0 ? (
+              <Text
+                style={{
+                  fontFamily: "MPlusBold",
+                  fontSize: Font.Small,
+                  textDecorationLine: "line-through",
+                  color: "grey",
+                  marginLeft: Spacing.Normal,
+                }}
+              >
+                ₹ {item.price}/{item.priceUnit}
+              </Text>
+            ) : (
+              <></>
+            )}
           </View>
           <View
             style={{
@@ -214,7 +220,6 @@ export default function NewsPaper({ navigation }) {
   };
 
   const fetchImages = async (id) => {
-    console.warn(id);
     try {
       const response = await axios.get(`/category/image/newspaper`);
       if (response.data) {
@@ -278,13 +283,14 @@ export default function NewsPaper({ navigation }) {
         </TouchableOpacity>
       </View>
       {NewsPaper.map((item, itemIndex) => {
-        const dis = (item.price / 100) * item.discount;
+        const dis =
+          (item.price / 100) * (item.discount > 0 ? item.discount : 0);
         const discountedPrice = item.price - dis;
         return (
           <Item
             discountedPrice={discountedPrice}
             item={item}
-            findImage={fetchImages}
+            findImage={findImage}
           />
         );
       })}
