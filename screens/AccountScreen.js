@@ -455,7 +455,7 @@ export default function AccountScreen(props) {
             />
             <View style={styles.fieldmargin} />
             <Input
-              placeholder="Enter New Pin Code Here"
+              placeholder="Enter Phone Number Here"
               value={phone}
               onChangeText={setPhone}
               style={styles.fieldmargin}
