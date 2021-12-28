@@ -18,39 +18,7 @@ import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
-
-const Data = [
-  {
-    id: "1",
-    name: "Onion",
-    image: require("../assets/img/vegetables.jpg"),
-    availableQuantity: ["1", "2", "3", "4", "5"],
-    initialQuantity: "4",
-    unit: "kg",
-    price: "10",
-    priceUnit: "kg",
-  },
-  {
-    id: "2",
-    name: "Potato",
-    image: require("../assets/img/vegetables.jpg"),
-    availableQuantity: ["4", "5"],
-    initialQuantity: "5",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-  {
-    id: "3",
-    name: "Cabbage",
-    image: require("../assets/img/vegetables.jpg"),
-    availableQuantity: ["1", "2", "10"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-];
+import Modal from "../components/Modal";
 
 const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
@@ -215,11 +183,24 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
 export default function Vegetables({ navigation }) {
   const [vegetables, setVegetables] = useState([]);
   const [imageState, setImageState] = useState([]);
+  const [responseData, setResponseData] = useState([]);
+  const [queryString, setQueryString] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const onSearch = (changeEvent) => {
+    const value = changeEvent;
+    setQueryString(value);
+    const result = responseData.filter((item) =>
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setVegetables(result);
+  };
 
   const fetchVegetables = async () => {
     try {
       const response = await axios.get("/category/vegetables");
       setVegetables(response.data);
+      setResponseData(response.data);
     } catch (error) {}
   };
 
@@ -254,6 +235,12 @@ export default function Vegetables({ navigation }) {
   }, []);
   return (
     <ScrollView style={styles.screen}>
+       <Modal
+        visible={modalVisible}
+        data={vegetables}
+        setData={setVegetables}
+        setModalVisible={setModalVisible}
+      ></Modal>
       <View
         style={{
           marginVertical: "5%",
@@ -265,6 +252,8 @@ export default function Vegetables({ navigation }) {
       >
         <TextInput
           placeholder="Search For Vegetables"
+          value={queryString}
+          onChangeText={onSearch}
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,

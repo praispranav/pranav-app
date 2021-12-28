@@ -17,42 +17,7 @@ import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
-
-// const Data = [
-//   {
-//     id: "1",
-//     name: "Shuda Milk Full Cream",
-//     image: require("../assets/img/Tifin.jpg"),
-//     availableQuantity: ["1", "2", "3", "4", "5"],
-//     initialQuantity: "4",
-//     unit: "liters",
-//     price: "100",
-//     priceUnit: "liter",
-//     subscription: true,
-//   },
-//   {
-//     id: "2",
-//     name: "Shuda Cow Milk",
-//     image: require("../assets/img/Tifin.jpg"),
-//     availableQuantity: ["4", "5"],
-//     initialQuantity: "5",
-//     unit: "liters",
-//     price: "100",
-//     priceUnit: "liter",
-//     subscription: false,
-//   },
-//   {
-//     id: "3",
-//     name: "Amul Butter",
-//     image: require("../assets/img/Tifin.jpg"),
-//     availableQuantity: ["100", "200", "500"],
-//     initialQuantity: "200",
-//     unit: "gram",
-//     price: "100",
-//     subscription: false,
-//     priceUnit: "100 gram",
-//   },
-// ];
+import Modal from "../components/Modal";
 
 const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
@@ -224,6 +189,16 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
 export default function Tifin({ navigation }) {
   const [Tifin, setTifin] = useState([]);
   const [imageState, setImageState] = useState([]);
+  const [responseData, setResponseData] = useState([])
+  const [queryString, setQueryString] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const onSearch= (changeEvent) =>{
+    const value = changeEvent
+    setQueryString(value)
+    const result = responseData.filter((item)=> item.name.toLowerCase().includes(value.toLowerCase()))
+    setTifin(result)
+  }
 
   const handleQuantityChange = (index, value) => {
     const state = [...Tifin];
@@ -235,7 +210,7 @@ export default function Tifin({ navigation }) {
     try {
       const response = await axios.get("/category/tifin");
       setTifin(response.data);
-      console.log(response.data);
+      setResponseData(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -266,12 +241,17 @@ export default function Tifin({ navigation }) {
   };
 
   useEffect(() => {
-    // setTifin(Data);
     fetchTifin();
     fetchImages();
   }, []);
   return (
     <ScrollView style={styles.screen}>
+      <Modal
+        visible={modalVisible}
+        data={Tifin}
+        setData={setTifin}
+        setModalVisible={setModalVisible}
+      ></Modal>
       <View
         style={{
           marginVertical: "5%",
@@ -283,6 +263,8 @@ export default function Tifin({ navigation }) {
       >
         <TextInput
           placeholder="Search For Tifin"
+          onChangeText={onSearch}
+          value={queryString}
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,

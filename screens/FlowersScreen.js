@@ -17,6 +17,7 @@ import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
+import Modal from "../components/Modal";
 
 // const Data = [
 //   {
@@ -227,18 +228,22 @@ const Item = ({item, discountedPrice, availableQuantity, findImage}) => {
 export default function Flowers({ navigation }) {
   const [Flowers, setFlowers] = useState([]);
   const [imageState, setImageState] = useState([]);
+  const [responseData, setResponseData] = useState([])
+  const [queryString, setQueryString] = useState('')
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleQuantityChange = (index, value) => {
-    const state = [...Flowers];
-    state[index].initialQuantity = value;
-    setFlowers(state);
-  };
+  const onSearch= (changeEvent) =>{
+    const value = changeEvent
+    setQueryString(value)
+    const result = responseData.filter((item)=> item.name.toLowerCase().includes(value.toLowerCase()))
+    setFlowers(result)
+  }
 
   const fetchFlowers = async () => {
     try {
       const response = await axios.get("/category/flowers");
       setFlowers(response.data);
-      console.log(response.data);
+      setResponseData(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -275,6 +280,12 @@ export default function Flowers({ navigation }) {
   }, []);
   return (
     <ScrollView style={styles.screen}>
+           <Modal
+        visible={modalVisible}
+        data={Flowers}
+        setData={setFlowers}
+        setModalVisible={setModalVisible}
+      ></Modal>
       <View
         style={{
           marginVertical: "5%",
@@ -286,6 +297,8 @@ export default function Flowers({ navigation }) {
       >
         <TextInput
           placeholder="Search For Flowers"
+          value={queryString}
+          onChangeText={onSearch}
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,

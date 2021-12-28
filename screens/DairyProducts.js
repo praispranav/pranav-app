@@ -18,6 +18,7 @@ import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
+import Modal from "../components/Modal";
 
 const Data = [
   {
@@ -88,7 +89,7 @@ const Item = ({ item, imageState, availableQuantity }) => {
           marginVertical: Spacing.Large,
         }}
       >
-        <View style={{ position: 'relative' }}>
+        <View style={{ position: "relative" }}>
           {findImage(item._id) ? (
             <>
               <Image
@@ -193,7 +194,8 @@ const Item = ({ item, imageState, availableQuantity }) => {
           </View>
           <View style={{ display: "flex", flexDirection: "row" }}>
             <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
-              ₹ {discountedPrice}/{item.subscription == 1 ? "month" : item.priceUnit}
+              ₹ {discountedPrice}/
+              {item.subscription == 1 ? "month" : item.priceUnit}
             </Text>
             {item.discount > 0 ? (
               <Text
@@ -266,6 +268,18 @@ const Item = ({ item, imageState, availableQuantity }) => {
 export default function Dairy({ navigation }) {
   const [Dairy, setDairy] = useState([]);
   const [imageState, setImageState] = useState([]);
+  const [responseData, setResponseData] = useState([]);
+  const [queryString, setQueryString] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const onSearch = (changeEvent) => {
+    const value = changeEvent;
+    setQueryString(value);
+    const result = responseData.filter((item) =>
+      item.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setDairy(result);
+  };
 
   const handleQuantityChange = (index, value) => {
     const state = [...Dairy];
@@ -277,7 +291,7 @@ export default function Dairy({ navigation }) {
     try {
       const response = await axios.get("/category/dairy");
       setDairy(response.data);
-      console.log(response.data);
+      setResponseData(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -301,6 +315,12 @@ export default function Dairy({ navigation }) {
   }, []);
   return (
     <ScrollView style={styles.screen}>
+      <Modal
+        visible={modalVisible}
+        data={Dairy}
+        setData={setDairy}
+        setModalVisible={setModalVisible}
+      ></Modal>
       <View
         style={{
           marginVertical: "5%",
@@ -312,6 +332,8 @@ export default function Dairy({ navigation }) {
       >
         <TextInput
           placeholder="Search For Dairy"
+          value={queryString}
+          onChangeText={onSearch}
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,
@@ -331,6 +353,7 @@ export default function Dairy({ navigation }) {
             alignItems: "center",
             backgroundColor: theme.backgroundColor,
           }}
+          onPress={() => setModalVisible(true)}
         >
           <FontAwesome name="sort-amount-asc" size={15} color="white" />
         </TouchableOpacity>

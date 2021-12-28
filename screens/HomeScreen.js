@@ -78,19 +78,6 @@ const products = [
 export default function HomeScreen({ navigation }) {
   return (
     <ScrollView style={styles.screen}>
-      <View style={{ marginVertical: "5%" }}>
-        <TextInput
-          placeholder="Search For Products"
-          style={{
-            fontFamily: "MPlus",
-            paddingHorizontal: Spacing.Large,
-            backgroundColor: theme.lightgrey,
-            width: "100%",
-            borderRadius: 30,
-            height: 40,
-          }}
-        />
-      </View>
 
       {/*Cards  */}
       <View

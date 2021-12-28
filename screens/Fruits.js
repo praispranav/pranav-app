@@ -17,6 +17,7 @@ import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
+import Modal from "../components/Modal";
 
 const Data = [
   {
@@ -253,6 +254,16 @@ const Item = ({ item, availableQuantity, discountedPrice, findImage }) => {
 export default function fruits({ navigation }) {
   const [fruits, setfruits] = useState([]);
   const [imageState, setImageState] = useState([]);
+  const [responseData, setResponseData] = useState([])
+  const [queryString, setQueryString] = useState('')
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const onSearch= (changeEvent) =>{
+    const value = changeEvent
+    setQueryString(value)
+    const result = responseData.filter((item)=> item.name.toLowerCase().includes(value.toLowerCase()))
+    setfruits(result)
+  }
 
   const handleQuantityChange = (index, value) => {
     const state = [...fruits];
@@ -264,6 +275,7 @@ export default function fruits({ navigation }) {
     try {
       const response = await axios.get("/category/fruits");
       setfruits(response.data);
+      setResponseData(response.data)
     } catch (error) {}
   };
 
@@ -298,6 +310,12 @@ export default function fruits({ navigation }) {
   }, []);
   return (
     <ScrollView style={styles.screen}>
+      <Modal
+        visible={modalVisible}
+        data={fruits}
+        setData={setfruits}
+        setModalVisible={setModalVisible}
+      ></Modal>
       <View
         style={{
           marginVertical: "5%",
@@ -309,6 +327,8 @@ export default function fruits({ navigation }) {
       >
         <TextInput
           placeholder="Search For fruits"
+          value={queryString}
+          onChangeText={onSearch}
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,

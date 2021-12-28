@@ -352,6 +352,13 @@ export default function SubscriptionDetails({ navigation, route }) {
     setDeliveryTimeRange(subscriptionInfo.deliveryTimeRange || "");
   }, []);
 
+  const totalDelivery = (array) =>{ 
+    let total = 0
+    deliveries.forEach((item)=> total = total + item.quantity)
+    console.warn(total)
+    return total
+  }
+
   return (
     <ScrollView style={styles.screen}>
       <View
@@ -761,7 +768,7 @@ export default function SubscriptionDetails({ navigation, route }) {
           >
             Deliveries
           </Text>
-          {deliveries.map((item) => (
+          {deliveries.map((item, index) => (
             <View style={{ borderWidth: 1, borderColor: "grey" }}>
               <View
                 style={{
@@ -777,7 +784,7 @@ export default function SubscriptionDetails({ navigation, route }) {
                 <Text style={{ width: 75 }}>
                   {moment(item.deliveryDate).format("YYYY-MM-DD")}
                 </Text>
-                <Text style={{ width: 50 }}>{item.quantity}</Text>
+                <Text style={{ width: 50 }}>{item.quantity + ' ' + subscriptionInfo.priceUnit}</Text>
                 <Text style={{ width: 50 }}>{item.status}</Text>
               </View>
               <View>
@@ -785,6 +792,9 @@ export default function SubscriptionDetails({ navigation, route }) {
               </View>
             </View>
           ))}
+          <View style={{ marginTop: 15 }}>
+                <Text>Total - {totalDelivery()} {subscriptionInfo.priceUnit}</Text>
+          </View>
         </View>
       </View>
     </ScrollView>

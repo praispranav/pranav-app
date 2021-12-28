@@ -178,7 +178,7 @@ export default function App({ navigation, route }) {
       <Drawer.Screen
         options={({ navigation }) => {
           return {
-            title: "Company Name",
+            title: "Varad Foods",
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (

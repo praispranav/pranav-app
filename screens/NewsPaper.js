@@ -16,6 +16,7 @@ import { Font } from "../constants/Fonts";
 import axios from "axios";
 import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
+import Modal from "../components/Modal";
 
 // const Data = [
 //   {
@@ -202,6 +203,16 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
 export default function NewsPaper({ navigation }) {
   const [NewsPaper, setNewsPaper] = useState([]);
   const [imageState, setImageState] = useState([]);
+  const [responseData, setResponseData] = useState([])
+  const [queryString, setQueryString] = useState('')
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const onSearch= (changeEvent) =>{
+    const value = changeEvent
+    setQueryString(value)
+    const result = responseData.filter((item)=> item.name.toLowerCase().includes(value.toLowerCase()))
+    setNewsPaper(result)
+  }
 
   const handleQuantityChange = (index, value) => {
     const state = [...NewsPaper];
@@ -213,6 +224,7 @@ export default function NewsPaper({ navigation }) {
     try {
       const response = await axios.get("/category/newspaper");
       setNewsPaper(response.data);
+      setResponseData(response.data)
       console.log(response.data);
     } catch (error) {
       console.log(error);
@@ -248,6 +260,12 @@ export default function NewsPaper({ navigation }) {
   }, []);
   return (
     <ScrollView style={styles.screen}>
+      <Modal
+        visible={modalVisible}
+        data={NewsPaper}
+        setData={setNewsPaper}
+        setModalVisible={setModalVisible}
+      ></Modal>
       <View
         style={{
           marginVertical: "5%",
@@ -259,6 +277,8 @@ export default function NewsPaper({ navigation }) {
       >
         <TextInput
           placeholder="Search For NewsPaper"
+          value={queryString}
+          onChangeText={onSearch}
           style={{
             fontFamily: "MPlus",
             paddingHorizontal: Spacing.Large,
