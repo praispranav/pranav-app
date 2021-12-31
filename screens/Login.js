@@ -4,17 +4,18 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Alert,
+  Alert,ScrollView
 } from "react-native";
 import { Spacing } from "../constants/MarginPadding";
 import routes from "../config/routes.json";
 import Button from "../components/Button";
-import Input from "../components/TextInput";
+// import Input from "../components/TextInput";
 import Text from "../elements/Text";
 import theme from "../config/theme";
 import { ActivityIndicator } from "react-native";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import { TextInput as InputText, Headline } from "react-native-paper"
 import LoadingScreen from "../components/Loading"
 
 async function save(key, value) {
@@ -52,9 +53,10 @@ export default function LoginScreen(props) {
     try {
       setLoading(true);
       const response = await axios.post("/user/auth/login", {
-        username,
+        username: username.toLowerCase() || username,
         password,
       });
+      console.warn("Username", username)
       await save("token", response.data.token);
       Alert.alert(
         "Login Successful",
@@ -122,30 +124,7 @@ export default function LoginScreen(props) {
   }, [token]);
   if(verifyingTOken) return <LoadingScreen />
   return (
-    <View style={{ display: "flex", flex: 1 }}>
-      <View
-        style={{
-          width: width + 110,
-          height: width + 110,
-          borderRadius: 5000,
-          position: "absolute",
-          top: -200,
-          left: -100,
-          backgroundColor: theme.backgroundColor,
-        }}
-      ></View>
-      <View
-        style={{
-          width: width + 110,
-          height: width + 110,
-          borderRadius: 5000,
-          position: "absolute",
-          bottom: -300,
-          right: -200,
-          backgroundColor: theme.backgroundColor,
-        }}
-      ></View>
-
+    <ScrollView style={{ display: "flex", flex: 1, backgroundColor:"white" }}>
       <View style={styles.screen}>
         <View style={styles.navigationContainer}>
           <Button
@@ -166,14 +145,16 @@ export default function LoginScreen(props) {
         </View>
         <View style={{ marginVertical: Spacing.Normal }}>
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
+            <Headline>Username</Headline>
+            <InputText mode="outlined"
               placeholder={"Enter Your Mobile or Email Here"}
               onChangeText={setUsername}
             />
           </View>
 
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
+          <Headline>Password</Headline>
+            <InputText mode="outlined" secureTextEntry={true}
               placeholder={"Enter Your Password Here"}
               onChangeText={setPassword}
             />
@@ -201,7 +182,6 @@ export default function LoginScreen(props) {
                 marginTop: Spacing.Normal,
                 height: 45,
                 borderRadius: 400,
-                overflow: "hidden",
               },
             ]}
           >
@@ -217,7 +197,7 @@ export default function LoginScreen(props) {
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -225,19 +205,16 @@ const styles = StyleSheet.create({
   screen: {
     display: "flex",
     flex: 1,
-    margin: Spacing.Normal,
-    marginHorizontal: 30,
-    marginTop: 125,
     borderRadius: 30,
-    elevation: 3,
     backgroundColor: "white",
     padding: Spacing.ExtraLarge + 20,
-    marginBottom: 65,
+    marginTop: 40,
+    height:'100%'
   },
   navigationContainer: {
     width: "100%",
-    height: 40,
     borderRadius: Spacing.ExtraLarge + 15,
+    height:40,
     borderWidth: 1,
     borderColor: "rgb(220,220,220)",
     display: "flex",

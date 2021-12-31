@@ -4,13 +4,14 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,Alert
+  ActivityIndicator,Alert, ScrollView
 } from "react-native";
 import { Spacing } from "../constants/MarginPadding";
 import routes from "../config/routes.json";
 import Button from "../components/Button";
-import Input from "../components/TextInput";
+// import Input from "../components/TextInput";
 import Text from "../elements/Text";
+import { TextInput as Input, Headline } from 'react-native-paper'
 import theme from "../config/theme";
 import axios from "axios";
 
@@ -74,29 +75,7 @@ export default function LoginScreen(props) {
   };
 
   return (
-    <View style={{ display: "flex", flex: 1 }}>
-      <View
-        style={{
-          width: width + 110,
-          height: width + 110,
-          borderRadius: 5000,
-          position: "absolute",
-          top: -200,
-          left: -100,
-          backgroundColor: theme.backgroundColor,
-        }}
-      ></View>
-      <View
-        style={{
-          width: width + 110,
-          height: width + 110,
-          borderRadius: 5000,
-          position: "absolute",
-          bottom: -300,
-          right: -200,
-          backgroundColor: theme.backgroundColor,
-        }}
-      ></View>
+    <ScrollView style={{ display: "flex", flex: 1, backgroundColor:"white" }}>
 
       <View style={styles.screen}>
         <View style={styles.navigationContainer}>
@@ -118,14 +97,14 @@ export default function LoginScreen(props) {
         </View>
         <View style={{ marginVertical: Spacing.ExtraLarge }}>
           <View style={{ marginTop: Spacing.Normal }}>
-            <Input
+            <Input mode="outlined"
               placeholder={"Enter Your Email Here"}
               value={email}
               onChangeText={setEmail}
             />
           </View>
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
+            <Input mode="outlined"
               placeholder={"Enter Your Name"}
               value={name}
               onChangeText={setName}
@@ -133,7 +112,7 @@ export default function LoginScreen(props) {
           </View>
 
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
+            <Input mode="outlined"
               placeholder={"Enter Your Mobile Here"}
               value={phone}
               onChangeText={setPhone}
@@ -141,7 +120,7 @@ export default function LoginScreen(props) {
           </View>
 
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
+            <Input mode="outlined"
               placeholder={"Enter Your Password Here"}
               value={password}
               onChangeText={setPassword}
@@ -149,7 +128,7 @@ export default function LoginScreen(props) {
             />
           </View>
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input
+            <Input mode="outlined"
               placeholder={"Enter Your Password Here"}
               value={password2}
               onChangeText={setPassword2}
@@ -184,7 +163,7 @@ export default function LoginScreen(props) {
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -192,14 +171,10 @@ const styles = StyleSheet.create({
   screen: {
     display: "flex",
     flex: 1,
-    margin: Spacing.Normal,
-    marginHorizontal: 30,
-    marginTop: 125,
     borderRadius: 30,
-    elevation: 3,
     backgroundColor: "white",
     padding: Spacing.ExtraLarge + 20,
-    marginBottom: 65,
+    marginTop: 40
   },
   navigationContainer: {
     width: "100%",

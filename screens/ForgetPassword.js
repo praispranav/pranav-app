@@ -16,6 +16,7 @@ import { ActivityIndicator } from "react-native";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import LoadingScreen from "../components/Loading";
+import {Headline, TextInput} from "react-native-paper"
 
 async function save(key, value) {
   return await SecureStore.setItemAsync("token", value);
@@ -54,8 +55,7 @@ export default function LoginScreen(props) {
     try {
       setLoading(true);
       let value;
-      if (email) value = { email: email };
-      if (phone) value = { phone: phone };
+      if (email) value = { email: email.toLowerCase() };
       const response = await axios.post("/user/auth/reqforotp", value);
       //   await save("token", response.data.token);
       Alert.alert(
@@ -78,7 +78,7 @@ export default function LoginScreen(props) {
       console.log(error);
       Alert.alert(
         "Error",
-        "Login Failed",
+      error.response.data.message,
         [
           {
             text: "OK",
@@ -98,43 +98,43 @@ export default function LoginScreen(props) {
     try {
       setLoading(true);
       let value;
-      if (email) value = { email: email, otp:otp };
-      if (phone) value = { phone: phone, otp: otp };
+      if (email) value = { email: email.toLowerCase(), otp: otp };
+      console.warn("Email Value",value)
       const response = await axios.post("/user/auth/otpverify", value);
       //   await save("token", response.data.token);
 
-      if(response.status !== 201){
+      if (response.status !== 201) {
         Alert.alert(
-            "Otp Sent",
-            response.data.message,
-            [
-              {
-                text: "OK",
-                style: "cancel",
-              },
-            ],
+          "Otp Sent",
+          response.data.message,
+          [
             {
-              cancelable: true,
-            }   )  
+              text: "OK",
+              style: "cancel",
+            },
+          ],
+          {
+            cancelable: true,
+          })
       }
-       if(response.status === 200 ) {
-        save("k",response.data.token.toString())
-           Alert.alert(
-             "Otp Sent",
-             response.data.message,
-             [
-               {
-                 text: "OK",
-                 onPress: () => props.navigation.navigate("Drawer"),
-                 style: "cancel",
-               },
-             ],
-             {
-               cancelable: true,
-               onDismiss: () => props.navigation.navigate("Drawer"),
-             }
-           );
-       }
+      if (response.status === 200) {
+        save("k", response.data.token.toString())
+        Alert.alert(
+          "Otp Sent",
+          response.data.message,
+          [
+            {
+              text: "OK",
+              onPress: () => props.navigation.navigate("Drawer"),
+              style: "cancel",
+            },
+          ],
+          {
+            cancelable: true,
+            onDismiss: () => props.navigation.navigate("Drawer"),
+          }
+        );
+      }
       setLoading(false);
       setOtpRequested(true)
     } catch (error) {
@@ -142,7 +142,7 @@ export default function LoginScreen(props) {
       console.log(error);
       Alert.alert(
         "Error",
-        "Could Not Sent Otp",
+        error.response.data.message,
         [
           {
             text: "OK",
@@ -159,13 +159,13 @@ export default function LoginScreen(props) {
     }
   };
 
-  const callback = () =>{
-      if(otpRequested){
-          submit()
-      } 
-      if(!otpRequested){
-          sendOtp()
-      }
+  const callback = () => {
+    if (otpRequested) {
+      submit()
+    }
+    if (!otpRequested) {
+      sendOtp()
+    }
   }
 
   const check = async () => {
@@ -174,7 +174,7 @@ export default function LoginScreen(props) {
       console.log("Function Called");
       setToken(r);
       props.navigation.navigate("Drawer");
-    } catch (error) {}
+    } catch (error) { }
   };
   useEffect(() => {
     check();
@@ -243,29 +243,32 @@ export default function LoginScreen(props) {
           />
         </View>
         <View style={{ marginVertical: Spacing.Normal }}>
-          {phone == true ? (
+          {true ? (
             <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-              <Input
-                placeholder={"Enter Your Mobile or Email Here"}
+              <Headline>Email</Headline>
+              <TextInput mode="outlined"
+                disabled={otpRequested}
+                placeholder={"Enter Your Email Here"}
                 onChangeText={setEmail}
               />
             </View>
           ) : (
             <></>
           )}
-          {email == true ? (
+          {/* {email == true ? (
             <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
               <Input
-                placeholder={"Enter Your Mobile or Email Here"}
+                placeholder={"Enter Your Mobile Here"}
                 onChangeText={setPhone}
               />
             </View>
           ) : (
             <></>
-          )}
+          )} */}
           {otpRequested && (
             <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-              <Input placeholder={"Enter Otp"} onChangeText={setOpt} />
+              <Headline>OTP</Headline>
+              <TextInput mode="outlined" placeholder={"Enter Otp"} onChangeText={setOpt} />
             </View>
           )}
         </View>

@@ -19,6 +19,7 @@ import * as SecureStore from "expo-secure-store";
 import Input from "../components/TextInput";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Headline } from "react-native-paper";
 
 const styles = StyleSheet.create({
   badge: {
@@ -447,24 +448,6 @@ export default function SubscriptionDetails({ navigation, route }) {
               }}
             >
               <TouchableOpacity
-                onPress={() => discardDayEdit()}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingHorizontal: 10,
-                  height: 20,
-                  borderRadius: 50,
-                  marginRight: 10,
-                  marginTop: 10,
-                  backgroundColor: theme.lightgrey,
-                }}
-              >
-                <Text style={{ color: "black" }}>{"Cancel"}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 onPress={() => updateDays()}
                 style={{
                   display: "flex",
@@ -793,7 +776,7 @@ export default function SubscriptionDetails({ navigation, route }) {
             </View>
           ))}
           <View style={{ marginTop: 15 }}>
-                <Text>Total - {totalDelivery()} {subscriptionInfo.priceUnit}</Text>
+                <Headline>Total - {totalDelivery()} {subscriptionInfo.priceUnit}</Headline>
           </View>
         </View>
       </View>
