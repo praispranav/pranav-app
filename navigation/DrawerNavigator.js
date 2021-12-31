@@ -122,6 +122,7 @@ import Tifin from "../screens/TifinScreen";
 import Flowers from "../screens/FlowersScreen";
 import AccountScreen from "../screens/AccountScreen";
 import Loading from "../components/Loading";
+import Stationary from "../screens/Stationary";
 
 
 const removeTOken = async ()=>{
@@ -548,6 +549,54 @@ export default function App({ navigation, route }) {
         }}
         name={`Dairy Products`}
         component={DairyProducts}
+      />
+         <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Dairy Products",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => handleAuth(navigation)}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginRight: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="user" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => navigation.openDrawer()}
+                style={{
+                  width: 35,
+                  height: 35,
+                  borderRadius: 25,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: theme.backgroundColorlight,
+                  marginLeft: 15,
+                  marginTop: 5,
+                }}
+              >
+                <AntDesign name="bars" size={15} color="white" />
+              </TouchableOpacity>
+            ),
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Stationary`}
+        component={Stationary}
       />
       <Drawer.Screen
         options={({ navigation }) => {

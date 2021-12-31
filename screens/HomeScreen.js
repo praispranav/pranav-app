@@ -61,7 +61,7 @@ const products = [
     action: ({ navigation }) => navigation.navigate("Fruits & Vegetables"),
   },
   {
-    label: "Grocery",
+    label: "Stationary",
     icon: (
       <MaterialCommunityIcons
         size={25}
@@ -70,8 +70,7 @@ const products = [
       />
     ),
     additionalInfo: null,
-    action: ({ navigation }) => navigation.navigate("Fruits & Vegetables"),
-    disabled: true,
+    action: ({ navigation }) => navigation.navigate("Stationary"),
   },
 ];
 
