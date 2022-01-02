@@ -31,7 +31,7 @@ const products = [
     action: ({ navigation }) => navigation.navigate("Dairy Products"),
   },
   {
-    label: "Tifin",
+    label: "Foods",
     icon: <Entypo size={25} color={theme.backgroundColor} name="box" />,
     additionalInfo: null,
     action: ({ navigation }) => navigation.navigate("Tifin"),

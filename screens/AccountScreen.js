@@ -90,7 +90,7 @@ const AddressItem = ({
       >
         <View>
           <Text style={{ width: 100 }}>{address1 + ","}</Text>
-          {address2 ? <Text style={{ marginTop: 5 }}>{address2}</Text> : <></>}
+          {address2 ? <Text style={{ marginTop: 5, width: 100 }}>{address2}</Text> : <></>}
           <Text style={{ marginTop: 5 }}>{phone}</Text>
         </View>
         <View style={{ position: "absolute", right: 100 }}>
