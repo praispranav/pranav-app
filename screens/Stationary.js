@@ -361,7 +361,7 @@ export default function fruits({ navigation }) {
           newObj.key = index;
           return newObj;
         });
-        const dis = (item.price / 100) * item.discount;
+        const dis = (item.price / 100) * (item.discount > 0 ? item.discount: 0);
         const discountedPrice = item.price - dis;
         return (
           <Item
