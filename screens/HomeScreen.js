@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -10,9 +10,10 @@ import { Spacing } from "../constants/MarginPadding";
 import Text from "../elements/Text";
 import Ionic from "react-native-vector-icons/Ionicons";
 import theme from "../config/theme";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { SliderBox } from "react-native-image-slider-box"
+import axios from "axios";
 
 // const theme = {
 //     backgroundColor: "red",
@@ -74,11 +75,48 @@ const products = [
   },
 ];
 
+
 export default function HomeScreen({ navigation }) {
+  const [images, setImages] = useState([])
+
+const fetchSliderImage =async () =>{
+  try{
+    const result = await axios.get('/category/slider/image')
+    setImages(result.data)
+
+  } catch(error){console.log(error)}
+} 
+
+useEffect(()=>{
+  fetchSliderImage()
+},[])
   return (
     <ScrollView style={styles.screen}>
 
       {/*Cards  */}
+      <TouchableOpacity
+        onPress={()=> navigation.navigate('Groceries')}
+        style={{
+          marginTop: "5%",
+          width: "100%",
+          height: 90,
+          borderWidth: 2,
+          borderColor: theme.backgroundColor,
+          borderRadius: 10,
+          overflow: "hidden",
+          display:'flex',
+           flexDirection: "row",
+           justifyContent:'center',
+           alignItems:"center"
+        }}
+      >
+        <SliderBox
+  images={images}
+  autoplay={true}
+  circleLoop={true}
+
+/>
+      </TouchableOpacity>
       <View
         style={{
           display: "flex",
@@ -126,7 +164,8 @@ export default function HomeScreen({ navigation }) {
         ))}
       </View>
 
-      <View
+      <TouchableOpacity
+        onPress={()=> navigation.navigate('Groceries')}
         style={{
           marginTop: "5%",
           width: "100%",
@@ -135,8 +174,20 @@ export default function HomeScreen({ navigation }) {
           borderColor: theme.backgroundColor,
           borderRadius: 10,
           overflow: "hidden",
+          display:'flex',
+           flexDirection: "row",
+           justifyContent:'center',
+           alignItems:"center"
         }}
-      ></View>
+      >
+         <MaterialCommunityIcons
+        size={25}
+        color={theme.backgroundColor}
+        name="fruit-grapes"
+      />
+      <Text style={{ marginLeft: 10 }}>Groceries</Text>
+
+      </TouchableOpacity>
 
       <View
         style={{
@@ -146,24 +197,6 @@ export default function HomeScreen({ navigation }) {
           flexWrap: "wrap",
         }}
       >
-        {/* {products.map((item) => (
-          <TouchableOpacity
-            style={{
-              width: "48%",
-              marginTop: "5%",
-              height: 90,
-              borderWidth: 2,
-              borderColor: theme.backgroundColor,
-              borderRadius: 10,
-              justifyContent: "center",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {item.icon}
-            <Text style={{ marginTop: Spacing.Small }}>{item.label}</Text>
-          </TouchableOpacity>
-        ))} */}
       </View>
       <View style={{ marginVertical: 20 }} />
     </ScrollView>

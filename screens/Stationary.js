@@ -326,7 +326,7 @@ export default function fruits({ navigation }) {
         }}
       >
         <TextInput
-          placeholder="Search For fruits"
+          placeholder="Search For Stationary"
           value={queryString}
           onChangeText={onSearch}
           style={{

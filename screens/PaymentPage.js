@@ -18,6 +18,7 @@ import TextFont from "../elements/Text";
 import Loading from "../components/Loading";
 import axios from "axios";
 import { useQuery } from "../hooks/useQuery";
+import { isEmpty } from "lodash";
 
 async function getValueFor(key) {
   let result = await SecureStore.getItemAsync("token");
@@ -123,9 +124,9 @@ const AddressItem = ({
         }}
       >
         <View>
-          <Text>{address1 + ","}</Text>
+          <Text style={{ width: 100 }}>{address1 + ","}</Text>
           {address2 ? <Text style={{ marginTop: 5 }}>{address2}</Text> : <></>}
-          <Text style={{ marginTop: 5 }}>{phone}</Text>
+          <Text style={{ marginTop: 5, width: 100 }}>{phone}</Text>
         </View>
         <View style={{ position: "absolute", right: 100 }}>
           <Text>{city + "," + state}</Text>
@@ -292,6 +293,16 @@ export default function PaymentPage(props) {
   }, [props.navigation]);
 
   if (loading) return <Loading />;
+
+  const totalDiscount = () => {
+    let total = 0;
+    productItem.forEach((item)=>{
+      
+      const price = item.price * item.selectedQuantity
+      total = total + price
+    })
+    return total
+  }
   return (
     <View style={styles.screen}>
       <ScrollView style={styles.scrollView}>
@@ -320,6 +331,14 @@ export default function PaymentPage(props) {
               setSelectedAddress={setSelectedAddress}
             />
           ))}
+          <View style={{ marginTop: 15, display: 'flex', flexDirection: 'row', justifyContent:'flex-end' }}>
+            <Text>Discount - Rs {totalDiscount() - response.total}</Text>
+          </View>
+          {
+            productItem.find((item)=> item.subscription == 1) ? (
+              <Text style={{ color: 'green', marginTop: 10 }}>Please select Delivery Time and Days from Order History Section. Order History > Subscription > Delivery Time Or Days </Text>
+            ):(<></>)
+          }
         </View>
         <View style={{ marginTop: Spacing.ExtraLarge }}>
           <TextFont style={{ fontFamily: "PT_SansBold" }}>

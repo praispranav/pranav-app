@@ -10,7 +10,7 @@ import Loading from "./components/Loading";
 import OriginalTheme from "./config/theme"
 import { DefaultTheme , Provider as MuiThemeProvider } from 'react-native-paper'
 
-// axios.defaults.baseURL = ""
+// axios.defaults.baseURL = "http://192.168.1.72:3000"
 axios.defaults.baseURL = "https://hris-backend-api.azurewebsites.net/"
 
 const INITIAL_STATE_LOADING = {

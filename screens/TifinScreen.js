@@ -39,10 +39,30 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
         }}
       >
         {findImage(item._id) ? (
+          <View style={{ position: 'relative' }}>
           <Image
             source={{ uri: findImage(item._id) }}
             style={{ width: 70, height: 70, borderRadius: 5 }}
-          />
+            />
+          {item.subscription == 1 ? (
+            <View
+            style={{
+              position: "absolute",
+              bottom: -10,
+              backgroundColor: theme.backgroundColor,
+              borderRadius: 100,
+              padding: 5,
+              right: 6,
+            }}
+            >
+              <Text style={{ fontSize: 10, color: "white" }}>
+                Subscription
+              </Text>
+            </View>
+          ) : (
+            <></>
+            )}
+            </View>
         ) : (
           <View style={{ width: 70, height: 70, borderRadius: 5 }} />
         )}
@@ -123,6 +143,8 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
             <Text style={{ fontFamily: "MPlusBold", fontSize: Font.Small }}>
               ₹ {discountedPrice}/{item.priceUnit}
             </Text>
+            {
+              item.discount && item.discount >0 ?(
             <Text
               style={{
                 fontFamily: "MPlusBold",
@@ -134,6 +156,8 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
             >
               ₹ {item.price}/{item.priceUnit}
             </Text>
+              ):(<></>)
+            }
           </View>
           <View
             style={{
@@ -186,8 +210,8 @@ const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
   );
 };
 
-export default function Tifin({ navigation }) {
-  const [Tifin, setTifin] = useState([]);
+export default function Foods({ navigation }) {
+  const [Foods, setFoods] = useState([]);
   const [imageState, setImageState] = useState([]);
   const [responseData, setResponseData] = useState([])
   const [queryString, setQueryString] = useState('');
@@ -197,19 +221,19 @@ export default function Tifin({ navigation }) {
     const value = changeEvent
     setQueryString(value)
     const result = responseData.filter((item)=> item.name.toLowerCase().includes(value.toLowerCase()))
-    setTifin(result)
+    setFoods(result)
   }
 
   const handleQuantityChange = (index, value) => {
-    const state = [...Tifin];
+    const state = [...Foods];
     state[index].initialQuantity = value;
-    setTifin(state);
+    setFoods(state);
   };
 
-  const fetchTifin = async () => {
+  const fetchFoods = async () => {
     try {
       const response = await axios.get("/category/tifin");
-      setTifin(response.data);
+      setFoods(response.data);
       setResponseData(response.data);
     } catch (error) {
       console.log(error);
@@ -241,15 +265,15 @@ export default function Tifin({ navigation }) {
   };
 
   useEffect(() => {
-    fetchTifin();
+    fetchFoods();
     fetchImages();
   }, []);
   return (
     <ScrollView style={styles.screen}>
       <Modal
         visible={modalVisible}
-        data={Tifin}
-        setData={setTifin}
+        data={Foods}
+        setData={setFoods}
         setModalVisible={setModalVisible}
       ></Modal>
       <View
@@ -262,7 +286,7 @@ export default function Tifin({ navigation }) {
         }}
       >
         <TextInput
-          placeholder="Search For Tifin"
+          placeholder="Search For Foods"
           onChangeText={onSearch}
           value={queryString}
           style={{
@@ -288,7 +312,7 @@ export default function Tifin({ navigation }) {
           <FontAwesome name="sort-amount-asc" size={15} color="white" />
         </TouchableOpacity>
       </View>
-      {Tifin.map((item, itemIndex) => {
+      {Foods.map((item, itemIndex) => {
         const availableQuantity = item.availableQuantity.map((i, index) => {
           const newObj = new Object();
           newObj.value = i.value;
@@ -296,7 +320,7 @@ export default function Tifin({ navigation }) {
           newObj.key = index;
           return newObj;
         });
-        const dis = (item.price / 100) * item.discount;
+        const dis = (item.price / 100) * (item.discount>0 ? item.discount:0 );
         const discountedPrice = item.price - dis;
         return (
           <Item

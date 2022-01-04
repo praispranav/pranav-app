@@ -19,6 +19,7 @@ import Flowers from "../screens/FlowersScreen";
 import AccountScreen from "../screens/AccountScreen";
 import Loading from "../components/Loading";
 import Stationary from "../screens/Stationary";
+import Groceries from "../screens/Groceries";
 
 const removeTOken = async (setTokenRemoved) => {
   await SecureStore.deleteItemAsync("token");
@@ -307,7 +308,21 @@ export default function App({ navigation, route }) {
       <Drawer.Screen
         options={({ navigation }) => {
           return {
-            title: "Dairy Products",
+            title: "Groceries",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+            headerRight: () => <UserButton navigation={navigation} />,
+            headerLeft: () => <DrawerButton navigation={navigation} />,
+            headerShadowVisible: false,
+          };
+        }}
+        name={`Groceries`}
+        component={Groceries}
+      />
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "Stationary",
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => <UserButton navigation={navigation} />,
@@ -395,3 +410,5 @@ export default function App({ navigation, route }) {
     </Drawer.Navigator>
   );
 }
+
+

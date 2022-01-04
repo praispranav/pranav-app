@@ -40,7 +40,7 @@ export default function Success({ navigation }) {
       <View style={styles.center}>
         <MaterialIcons name="verified" size={100} color={theme.backgroundColor} />
         <Text style={[styles.marginTop, styles.font1]}>Order Placed Successfully.</Text>
-        <Text style={[styles.marginTop]}>Thanks For SHopping with us.</Text>
+        <Text style={[styles.marginTop]}>Thanks For Shopping with us.</Text>
         <TouchableOpacity onPress={()=> navigation.navigate('HomeScreen')} style={[styles.button, styles.marginTop]}><Text style={{ color: "white"}}>Home</Text></TouchableOpacity>
       </View>
     </View>
