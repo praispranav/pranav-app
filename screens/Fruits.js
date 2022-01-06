@@ -339,7 +339,7 @@ export default function fruits({ navigation }) {
           }}
         />
         <TouchableOpacity
-          onPress={() => navigation.navigate("LoginScreen")}
+          onPress={()=> setModalVisible(true)}
           style={{
             width: 35,
             height: 35,

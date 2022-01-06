@@ -19,38 +19,6 @@ import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
 import Modal from "../components/Modal";
 
-const Data = [
-  {
-    id: "1",
-    name: "Grapes",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1", "2", "3", "4", "5"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-  {
-    id: "2",
-    name: "Orange",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["4", "5"],
-    initialQuantity: "5",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-  {
-    id: "3",
-    name: "Apple",
-    image: require("../assets/img/fruits.jpg"),
-    availableQuantity: ["1", "2", "10"],
-    initialQuantity: "1",
-    unit: "kg",
-    price: "100",
-    priceUnit: "kg",
-  },
-];
 
 const Item = ({ item, availableQuantity, discountedPrice, findImage }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
@@ -339,7 +307,7 @@ export default function fruits({ navigation }) {
           }}
         />
         <TouchableOpacity
-          onPress={() => navigation.navigate("LoginScreen")}
+          onPress={()=> setModalVisible(true)}
           style={{
             width: 35,
             height: 35,

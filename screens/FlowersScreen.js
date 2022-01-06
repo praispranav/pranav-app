@@ -335,7 +335,7 @@ export default function Flowers({ navigation }) {
             height: 40,
           }}
         />
-        <TouchableOpacity
+        <TouchableOpacity onPress={()=> setModalVisible(true)}
           style={{
             width: 35,
             height: 35,

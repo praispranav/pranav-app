@@ -298,7 +298,7 @@ export default function Foods({ navigation }) {
             height: 40,
           }}
         />
-        <TouchableOpacity
+        <TouchableOpacity onPress={()=> setModalVisible(true)}
           style={{
             width: 35,
             height: 35,

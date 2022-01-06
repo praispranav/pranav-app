@@ -9,6 +9,7 @@ import {
   Touchable,
   TouchableOpacity,
 } from "react-native";
+import AntDesign from "react-native-vector-icons/AntDesign"
 
 const ModalScreen = ({ visible, setModalVisible, data, setData }) => {
   const sortChange = (value) => {
@@ -35,8 +36,6 @@ const ModalScreen = ({ visible, setModalVisible, data, setData }) => {
     setModalVisible(false);
   };
   return (
-    <>
-      {visible && (
         <View
           style={styles.centeredView}
           onPress={() => setModalVisible(false)}
@@ -70,12 +69,16 @@ const ModalScreen = ({ visible, setModalVisible, data, setData }) => {
                 >
                   <Text style={styles.textStyle}>Price: High To Low</Text>
                 </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose, { marginTop: 20, backgroundColor:'black' }]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.textStyle}>Close</Text>
+                </Pressable>
               </View>
             </View>
           </Modal>
         </View>
-      )}
-    </>
   );
 };
 
@@ -83,8 +86,9 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.2)",
+    position:'relative'
   },
   modalView: {
     margin: 20,
