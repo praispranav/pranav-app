@@ -267,11 +267,13 @@ export default function SubscriptionDetails({ navigation, route }) {
 
   const handleCancelDatePicker = (e) => {
     setDatePickerState({ extra: false, cancel: false });
+    console.warn("Cancle Before", cancelState);
     setCancelState((prevState) => ({
       ...prevState,
-      date: e.nativeEvent.timestamp,
       token: token,
+      date: e.nativeEvent.timestamp,
     }));
+    console.warn("Cancle After", cancelState);
     console.warn(cancelState, "Cancel");
   };
 
@@ -288,11 +290,13 @@ export default function SubscriptionDetails({ navigation, route }) {
   const submitCancel = async () => {
     setLoading((prevState) => ({ ...prevState, cancelDelivery: true }));
     try {
-      await axios.post("/order/subscription/cancel/date", {
+      const obj ={
         ...cancelState,
         subscriptionId: subscriptionInfo._id,
         token: await getValueFor(),
-      });
+      }
+      console.warn("Cancel Object", obj)
+      await axios.post("/order/subscription/cancel/date", obj);
       Alert.alert("Success", "Cancel Request Submitted");
       setCancelState({
         token: "",
@@ -339,7 +343,7 @@ export default function SubscriptionDetails({ navigation, route }) {
   const showCancelDatePicker = () =>
     setDatePickerState((prevState) => ({
       ...prevState,
-      extra: !prevState.extra,
+      cancel: !prevState.extra,
     }));
 
   useEffect(() => {

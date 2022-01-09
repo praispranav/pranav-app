@@ -20,6 +20,22 @@ import axios from "axios";
 import { useQuery } from "../hooks/useQuery";
 import { isEmpty } from "lodash";
 
+import { useStripe } from '@stripe/stripe-react-native';
+import ButtonPayment from '../components/ButtonPayment';
+import PaymentScreen from '../components/PaymentScreen';
+
+export const API_URL = "http://192.168.1.72:8080"
+
+
+export const colors = {
+  blurple: '#635BFF',
+  blurple_dark: '#5851DF',
+  white: '#FFFFFF',
+  light_gray: '#F6F9FC',
+  dark_gray: '#425466',
+  slate: '#0A2540',
+};
+
 async function getValueFor(key) {
   let result = await SecureStore.getItemAsync("token");
   if (result) {
@@ -244,6 +260,74 @@ export default function PaymentPage(props) {
   //   // }
   // }
 
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [paymentSheetEnabled, setPaymentSheetEnabled] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [clientSecret, setClientSecret] = useState();
+
+  const fetchPaymentSheetParams = async () => {
+    const response = await fetch(`${API_URL}/payment-sheet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    setClientSecret(paymentIntent);
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const openPaymentSheet = async () => {
+    if (!clientSecret) {
+      return;
+    }
+    setPaymentLoading(true);
+    const { error } = await presentPaymentSheet({
+      clientSecret,
+    });
+
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      Alert.alert('Success', 'The payment was confirmed successfully');
+    }
+    setPaymentSheetEnabled(false);
+    setPaymentLoading(false);
+  };
+
+  const initialisePaymentSheet = async () => {
+    const {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    } = await fetchPaymentSheetParams();
+
+    const { error } = await initPaymentSheet({
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      customFlow: false,
+      merchantDisplayName: 'Example Inc.',
+      style: 'alwaysDark',
+    });
+    if (!error) {
+      setPaymentSheetEnabled(true);
+    }
+  };
+
+  useEffect(() => {
+    // In your app’s checkout, make a network request to the backend and initialize PaymentSheet.
+    // To reduce loading time, make this request before the Checkout button is tapped, e.g. when the screen is loaded.
+    initialisePaymentSheet();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   const getAddress = async (t) => {
     setLoading(true);
     try {
@@ -336,7 +420,7 @@ export default function PaymentPage(props) {
           </View>
           {
             productItem.find((item)=> item.subscription == 1) ? (
-              <Text style={{ color: 'green', marginTop: 10 }}>Please select Delivery Time and Days from Order History Section. Order History > Subscription > Delivery Time Or Days </Text>
+              <Text style={{ color: 'green', marginTop: 10 }}>Please select delivery time and days from oder history section after sumit.</Text>
             ):(<></>)
           }
         </View>
@@ -356,6 +440,17 @@ export default function PaymentPage(props) {
           >
             <Text>Cash On Delivery</Text>
           </View>
+          <PaymentScreen>
+    
+      <ButtonPayment
+        variant="primary"
+        loading={paymentLoading}
+        disabled={!paymentSheetEnabled}
+        title="Checkout"
+        onPress={openPaymentSheet}
+      />
+    </PaymentScreen>
+
           {/* {productItem.map((item, index) => (
             <ProductItem {...item} index={index} fetch={()=> fetchProducts('/order/cart/get') } selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress} />
           ))} */}

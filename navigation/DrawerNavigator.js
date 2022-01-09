@@ -336,7 +336,7 @@ export default function App({ navigation, route }) {
       <Drawer.Screen
         options={({ navigation }) => {
           return {
-            title: "History",
+            title: "Order History",
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
             headerRight: () => (
