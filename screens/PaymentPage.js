@@ -20,20 +20,20 @@ import axios from "axios";
 import { useQuery } from "../hooks/useQuery";
 import { isEmpty } from "lodash";
 
-import { useStripe } from '@stripe/stripe-react-native';
-import ButtonPayment from '../components/ButtonPayment';
-import PaymentScreen from '../components/PaymentScreen';
+import { useStripe } from "@stripe/stripe-react-native";
+import ButtonPayment from "../components/ButtonPayment";
+import PaymentScreen,{ API_URL} from "../components/PaymentScreen";
+import Entypo from "react-native-vector-icons/Entypo"
 
-export const API_URL = "http://192.168.1.72:8080"
-
+// export const API_URL = "http://192.168.1.70:8080";
 
 export const colors = {
-  blurple: '#635BFF',
-  blurple_dark: '#5851DF',
-  white: '#FFFFFF',
-  light_gray: '#F6F9FC',
-  dark_gray: '#425466',
-  slate: '#0A2540',
+  blurple: "#635BFF",
+  blurple_dark: "#5851DF",
+  white: "#FFFFFF",
+  light_gray: "#F6F9FC",
+  dark_gray: "#425466",
+  slate: "#0A2540",
 };
 
 async function getValueFor(key) {
@@ -176,7 +176,8 @@ const ProductItem = ({
   name,
   selectedQuantity,
   priceUnit,
-  subscription,discount
+  subscription,
+  discount,
 }) => {
   return (
     <View
@@ -198,7 +199,7 @@ const ProductItem = ({
               backgroundColor: theme.backgroundColor,
               borderRadius: 100,
               padding: 5,
-              paddingVertical: 1
+              paddingVertical: 1,
             }}
           >
             <Text style={{ fontSize: 10, color: "white" }}>Subscription</Text>
@@ -215,7 +216,8 @@ const ProductItem = ({
         </Text>
         <Text style={{ marginLeft: 10 }}>
           {" "}
-          Dis: ₹ {discount > 0 ? ((price/100) * discount * selectedQuantity) : 0 }
+          Dis: ₹{" "}
+          {discount > 0 ? (price / 100) * discount * selectedQuantity : 0}
         </Text>
       </View>
     </View>
@@ -230,12 +232,13 @@ export default function PaymentPage(props) {
   const productItem = response.data || [];
   const [token, setToken] = useState("");
   const [paymentMode] = useState({ paymentMode: "Cash On Delivery" });
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState("CASH")
 
   const generate = async () => {
     const obj = {
       address: selectedAddress,
       products: productItem,
-      paymentMode: paymentMode,
+      paymentMode: selectedPaymentMode,
       token: await getValueFor(),
     };
     console.log(obj);
@@ -264,15 +267,23 @@ export default function PaymentPage(props) {
   const [paymentSheetEnabled, setPaymentSheetEnabled] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState();
+ 
+  function getValueFor(key) {
+    return new Promise(async (resolve, rejects) => {
+      let result = await SecureStore.getItemAsync("token");
+      if (result) {
+        resolve(result);
+      } else {
+        rejects("");
+      }
+    });
+  }
 
   const fetchPaymentSheetParams = async () => {
-    const response = await fetch(`${API_URL}/payment-sheet`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
+
+    const token = await getValueFor()
+    const { data:response } = await axios.post(`${API_URL}/payment-sheet`,{ token: token} );
+    const { paymentIntent, ephemeralKey, customer } = await response
     setClientSecret(paymentIntent);
     return {
       paymentIntent,
@@ -291,28 +302,25 @@ export default function PaymentPage(props) {
     });
 
     if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
+      // Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
-      Alert.alert('Success', 'The payment was confirmed successfully');
+      generate();
     }
     setPaymentSheetEnabled(false);
     setPaymentLoading(false);
   };
 
   const initialisePaymentSheet = async () => {
-    const {
-      paymentIntent,
-      ephemeralKey,
-      customer,
-    } = await fetchPaymentSheetParams();
+    const { paymentIntent, ephemeralKey, customer } =
+      await fetchPaymentSheetParams();
 
     const { error } = await initPaymentSheet({
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
       customFlow: false,
-      merchantDisplayName: 'Example Inc.',
-      style: 'alwaysDark',
+      merchantDisplayName: "Example Inc.",
+      style: "alwaysDark",
     });
     if (!error) {
       setPaymentSheetEnabled(true);
@@ -326,7 +334,6 @@ export default function PaymentPage(props) {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   const getAddress = async (t) => {
     setLoading(true);
@@ -380,13 +387,12 @@ export default function PaymentPage(props) {
 
   const totalDiscount = () => {
     let total = 0;
-    productItem.forEach((item)=>{
-      
-      const price = item.price * item.selectedQuantity
-      total = total + price
-    })
-    return total
-  }
+    productItem.forEach((item) => {
+      const price = item.price * item.selectedQuantity;
+      total = total + price;
+    });
+    return total;
+  };
   return (
     <View style={styles.screen}>
       <ScrollView style={styles.scrollView}>
@@ -415,41 +421,76 @@ export default function PaymentPage(props) {
               setSelectedAddress={setSelectedAddress}
             />
           ))}
-          <View style={{ marginTop: 15, display: 'flex', flexDirection: 'row', justifyContent:'flex-end' }}>
+          <View
+            style={{
+              marginTop: 15,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-end",
+            }}
+          >
             <Text>Discount - Rs {totalDiscount() - response.total}</Text>
           </View>
-          {
-            productItem.find((item)=> item.subscription == 1) ? (
-              <Text style={{ color: 'green', marginTop: 10 }}>Please select delivery time and days from oder history section after sumit.</Text>
-            ):(<></>)
-          }
+          {productItem.find((item) => item.subscription == 1) ? (
+            <Text style={{ color: "green", marginTop: 10 }}>
+              Please select delivery time and days from oder history section
+              after sumit.
+            </Text>
+          ) : (
+            <></>
+          )}
         </View>
         <View style={{ marginTop: Spacing.ExtraLarge }}>
           <TextFont style={{ fontFamily: "PT_SansBold" }}>
             Payment Mode
           </TextFont>
-          <View
+          <View style={{ display: 'flex', flexDirection: 'row',alignItems:'center', marginTop: 15,  }}>
+            {
+              selectedPaymentMode == 'CASH' && (
+                <Entypo name="chevron-small-right" size={20} />
+              )
+            }
+          <TouchableOpacity
             style={{
               width: 150,
               paddingHorizontal: 10,
-              marginTop: 15,
               paddingVertical: 10,
               borderRadius: 10,
               backgroundColor: theme.themeLight,
             }}
+            onPress={()=> setSelectedPaymentMode("CASH")}
           >
             <Text>Cash On Delivery</Text>
+          </TouchableOpacity>
           </View>
           <PaymentScreen>
-    
-      <ButtonPayment
-        variant="primary"
-        loading={paymentLoading}
-        disabled={!paymentSheetEnabled}
-        title="Checkout"
-        onPress={openPaymentSheet}
-      />
-    </PaymentScreen>
+            {/* <ButtonPayment
+              variant="primary"
+              loading={paymentLoading}
+              disabled={!paymentSheetEnabled}
+              title="Credit/Debit Card"
+              onPress={openPaymentSheet}
+            /> */}
+             <View style={{ display: 'flex', flexDirection: 'row',alignItems:'center', marginTop: 15,  }}>
+            {
+              selectedPaymentMode == 'ONLINE' && (
+                <Entypo name="chevron-small-right" size={20} />
+              )
+            }
+            <TouchableOpacity
+            style={{
+              width: 150,
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              borderRadius: 10,
+              backgroundColor: theme.themeLight,
+            }}
+            onPress={()=> { openPaymentSheet(); setSelectedPaymentMode("ONLINE")}}
+          >
+            <Text>Credit/Debit Card</Text>
+          </TouchableOpacity>
+             </View>
+          </PaymentScreen>
 
           {/* {productItem.map((item, index) => (
             <ProductItem {...item} index={index} fetch={()=> fetchProducts('/order/cart/get') } selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress} />
@@ -457,7 +498,14 @@ export default function PaymentPage(props) {
         </View>
         <View style={{ marginTop: 100 }} />
       </ScrollView>
-      <TouchableOpacity onPress={generate} style={styles.button}>
+      <TouchableOpacity onPress={()=> {
+        if(selectedPaymentMode === 'ONLINE'){
+          return
+        } else {
+          generate()
+        }
+      }
+      } style={styles.button}>
         <View
           style={{
             display: "flex",

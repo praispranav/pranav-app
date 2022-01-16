@@ -6,7 +6,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { Alert } from 'react-native';
 
-export const API_URL = "http://192.168.1.72:8080"
+export const API_URL = "http://192.168.1.70:3000/payment"
 
 export async function fetchPublishableKey(
   paymentMethod
@@ -47,12 +47,18 @@ const PaymentScreen = ({ paymentMethod, children }) => {
     async function initialize() {
       const publishableKey = await fetchPublishableKey(paymentMethod);
       if (publishableKey) {
-        await initStripe({
-          publishableKey,
-          merchantIdentifier: 'merchant.com.stripe.react.native',
-          urlScheme: 'stripe-example',
-          setUrlSchemeOnAndroid: true,
-        });
+        console.warn("Key", publishableKey)
+        try{
+          await initStripe({
+            publishableKey,
+            merchantIdentifier: 'merchant.com.stripe.react.native',
+            urlScheme: 'stripe-example',
+            setUrlSchemeOnAndroid: true,
+          });
+        } catch(error){
+          Alert.alert("Error","Something Went Wrong")
+          console.log("Stripe Error",error)
+        }
         setLoading(false);
       }
     }
@@ -61,7 +67,7 @@ const PaymentScreen = ({ paymentMethod, children }) => {
   }, []);
 
   return loading ? (
-    <ActivityIndicator size="large" style={StyleSheet.absoluteFill} />
+    <ActivityIndicator size="large" color={"blue"} style={StyleSheet.absoluteFill} />
   ) : (
     <ScrollView
       accessibilityLabel="payment-screen"
@@ -69,7 +75,6 @@ const PaymentScreen = ({ paymentMethod, children }) => {
       keyboardShouldPersistTaps="handled">
       {children}
       {/* eslint-disable-next-line react-native/no-inline-styles */}
-      <Text style={{ opacity: 0 }}>appium fix</Text>
     </ScrollView>
   );
 };
@@ -78,8 +83,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    paddingTop: 20,
-    paddingHorizontal: 16,
+    minHeight: 100,
   },
 });
 
