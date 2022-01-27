@@ -319,7 +319,7 @@ export default function PaymentPage(props) {
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
       customFlow: false,
-      merchantDisplayName: "Example Inc.",
+      merchantDisplayName: "Varad Foods",
       style: "alwaysDark",
     });
     if (!error) {

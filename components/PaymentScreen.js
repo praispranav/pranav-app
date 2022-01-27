@@ -1,12 +1,10 @@
 import { initStripe } from '@stripe/stripe-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text } from 'react-native';
-// import { colors } from '../colors';
-// import { fetchPublishableKey } from '../helpers';
-
 import { Alert } from 'react-native';
 
-export const API_URL = "http://192.168.1.70:3000/payment"
+export const API_URL = "https://hris-backend-api.azurewebsites.net/payment"
+// export const API_URL = "http://192.168.1.70:3000/payment"
 
 export async function fetchPublishableKey(
   paymentMethod
