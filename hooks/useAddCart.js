@@ -17,6 +17,8 @@ function getValueFor(key) {
 }
 
 export function useAddCart() {
+
+
   const [loading, setLoading] = useState(false);
   const fetch = async (productId, quantity) => {
     console.warn("Quantity", quantity);

@@ -41,7 +41,7 @@ export default function AppNavigator() {
       screenOptions={{
         animationTypeForReplace: "push",
       }}
-      initialRouteName={token.length > 100 ? "Drawer" : "LoginScreen"}
+      initialRouteName={'Drawer'}
     >
       {AppNavigatorList.map((item, index) => (
         <Stack.Screen {...item} key={index} />

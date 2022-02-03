@@ -1,17 +1,19 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { View , Text } from "react-native";
+import { View, Text } from "react-native";
 import * as Font from "expo-font";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
-import  AppNavigator from "./navigation/AppNavigator";
-import axios from 'axios'
+import AppNavigator from "./navigation/AppNavigator";
+import axios from "axios";
 import Loading from "./components/Loading";
-import OriginalTheme from "./config/theme"
-import { DefaultTheme , Provider as MuiThemeProvider } from 'react-native-paper'
+import OriginalTheme from "./config/theme";
+import { DefaultTheme, Provider as MuiThemeProvider } from "react-native-paper";
+import { Provider as ReduxProvider } from "react-redux";
+import { store } from "./redux/store";
 
 // axios.defaults.baseURL = "http://192.168.1.70:3000"
-axios.defaults.baseURL = "https://hris-backend-api.azurewebsites.net/"
+axios.defaults.baseURL = "https://hris-backend-api.azurewebsites.net/";
 
 const INITIAL_STATE_LOADING = {
   loadingFont: true,
@@ -33,7 +35,7 @@ export default function App() {
   useEffect(() => {
     loadFonts();
   }, []);
-  if (loading.loadingFont) return <Loading />
+  if (loading.loadingFont) return <Loading />;
 
   const theme = {
     ...DefaultTheme,
@@ -42,15 +44,18 @@ export default function App() {
       primary: OriginalTheme.backgroundColor,
       accent: OriginalTheme.backgroundColorlight,
     },
-  }
+  };
 
   return (
+    <ReduxProvider store={store}>
+
     <MuiThemeProvider theme={theme}>
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </MuiThemeProvider>
+    </ReduxProvider>
   );
 }

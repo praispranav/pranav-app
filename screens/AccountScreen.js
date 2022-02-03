@@ -24,6 +24,12 @@ async function getValueFor(key) {
   }
 }
 
+// const removeTOken = async (setTokenRemoved) => {
+//   await SecureStore.deleteItemAsync("token");
+//   setTokenRemoved(true);
+//   // navigation.navigate('LoginScreen')
+// };
+
 const AddressItem = ({
   city,
   state,
@@ -126,7 +132,7 @@ const styles = StyleSheet.create({
     height: "95%",
   },
   userContainer: {
-    height: 200,
+    height: 240,
     width: "100%",
     display: "flex",
     alignItems: "center",
@@ -190,7 +196,7 @@ const INITIAL_USER_STATE = {
   phone: "",
 };
 
-async function saveToken(key, value) {
+async function deleteToken(key, value) {
   await SecureStore.deleteItemAsync("token");
 }
 
@@ -384,6 +390,12 @@ export default function AccountScreen(props) {
           <Text style={{ marginTop: Spacing.Normal }}>{user.name}</Text>
           <Text>{user.phone}</Text>
           <Text>{user.email}</Text>
+          <TouchableOpacity onPress={()=> { 
+            deleteToken();
+            props.navigation.navigate('HomeScreen')
+          }} style={[styles.buttonBG, { marginVertical: 15 , marginBottom: 15}]}>
+            <Text>Log Out</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.buttonContainer}>

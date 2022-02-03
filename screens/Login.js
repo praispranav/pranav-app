@@ -79,7 +79,7 @@ export default function LoginScreen(props) {
       console.log(error)
       Alert.alert(
         "Error",
-        "Login Failed",
+        "No Internet Connection Or Password May be wrong.",
         [
           {
             text: "OK",

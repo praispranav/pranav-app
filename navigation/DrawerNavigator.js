@@ -20,6 +20,7 @@ import AccountScreen from "../screens/AccountScreen";
 import Loading from "../components/Loading";
 import Stationary from "../screens/Stationary";
 import Groceries from "../screens/Groceries";
+import { useSelector } from 'react-redux';
 
 const removeTOken = async (setTokenRemoved) => {
   await SecureStore.deleteItemAsync("token");
@@ -89,31 +90,15 @@ const LogOutScreen = ({ navigation }) => {
 const Drawer = createDrawerNavigator();
 
 export default function App({ navigation, route }) {
-  // const [tokenLoaded, setTokenLoaded] = React.useState(true);
-  // const [token, setToken] = React.useState("");
+ const authState = useSelector(s=> s.auth)
 
-  // const check = async () => {
-  //   try {
-  //     const r = await getValueFor();
-  //     setToken(r);
-  //     setTokenLoaded(false);
-  //   } catch (err) {
-  //     setTokenLoaded(false);
-  //   } finally {
-  //     console.log(token);
-  //   }
-  // };
   const handleAuth = (navigation) => {
-    navigation.navigate("Account");
+    if(authState.isUserAuthorised){
+      navigation.navigate("Account");
+    } else {
+      navigation.navigate("LoginScreen");
+    }
   };
-  // React.useEffect(() => {
-  //   const unsubscribe = navigation.addListener("focus", async () => {
-  //     try {
-  //       check()
-  //     } catch (error) {}
-  //   });
-  //   return unsubscribe;
-  // }, [navigation, route]);
 
   const ShoppingCartButton = ({ navigation }) => (
     <TouchableOpacity
@@ -394,7 +379,7 @@ export default function App({ navigation, route }) {
             name="Account"
             component={AccountScreen}
           />
-          <Drawer.Screen
+          {/* <Drawer.Screen
             options={({ navigation }) => {
               return {
                 title: "Logout",
@@ -404,7 +389,7 @@ export default function App({ navigation, route }) {
             }}
             name="Logout"
             component={LogOutScreen}
-          />
+          /> */}
         </>
       )}
     </Drawer.Navigator>

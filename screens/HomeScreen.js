@@ -12,15 +12,23 @@ import Ionic from "react-native-vector-icons/Ionicons";
 import theme from "../config/theme";
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { SliderBox } from "react-native-image-slider-box"
+import { SliderBox } from "react-native-image-slider-box";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import jwt_decode from 'jwt-decode';
+import { addToken, authoriseUser } from '../redux/slice';
+import * as SecureStore from 'expo-secure-store';
 
-// const theme = {
-//     backgroundColor: "red",
-//     border: "red",
-//     grey: 'rgb(170,170,170)',
-//     lightgrey: "rgb(245,245,245)"
-// }
+function getValueFor(key) {
+  return new Promise(async (resolve, rejects) => {
+    let result = await SecureStore.getItemAsync("token");
+    if (result) {
+      resolve(result);
+    } else {
+      rejects("");
+    }
+  });
+}
 
 const products = [
   {
@@ -75,47 +83,66 @@ const products = [
   },
 ];
 
-
 export default function HomeScreen({ navigation }) {
-  const [images, setImages] = useState([])
+  const [images, setImages] = useState([]);
+  const authState = useSelector(s=> s.auth);
+  const dispatch = useDispatch()
+  // console.warn(authState)
 
-const fetchSliderImage =async () =>{
-  try{
-    const result = await axios.get('/category/slider/image')
-    setImages(result.data)
+  const fetchSliderImage = async () => {
+    try {
+      const result = await axios.get("/category/slider/image");
+      setImages(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  } catch(error){console.log(error)}
-} 
+  useEffect(() => {
+    fetchSliderImage();
+  }, []);
 
-useEffect(()=>{
-  fetchSliderImage()
-},[])
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      try{
+        const token = await getValueFor();
+        console.log(token)
+        const decode = jwt_decode(token);
+        console.warn(decode)
+        dispatch(addToken(token));
+        if(token) {
+          dispatch(authoriseUser(true))
+        }
+      } catch(error){
+        console.log("Navigation Error", error)
+        dispatch(addToken(''));
+        dispatch(authoriseUser(false))
+        console.log(authState);
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+  
   return (
     <ScrollView style={styles.screen}>
-
       {/*Cards  */}
       <TouchableOpacity
-        onPress={()=> navigation.navigate('Groceries')}
         style={{
           marginTop: "5%",
           width: "100%",
-          height: 90,
+          height: "30%",
           borderWidth: 2,
           borderColor: theme.backgroundColor,
           borderRadius: 10,
           overflow: "hidden",
-          display:'flex',
-           flexDirection: "row",
-           justifyContent:'center',
-           alignItems:"center"
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <SliderBox
-  images={images}
-  autoplay={true}
-  circleLoop={true}
-
-/>
+        <SliderBox images={images} autoplay={true} circleLoop={true} />
       </TouchableOpacity>
       <View
         style={{
@@ -132,12 +159,12 @@ useEffect(()=>{
               marginTop: "5%",
               height: 90,
               borderWidth: 2,
-              borderColor: !item.disabled ? theme.backgroundColor: "grey",
+              borderColor: !item.disabled ? theme.backgroundColor : "grey",
               borderRadius: 10,
               justifyContent: "center",
               display: "flex",
               alignItems: "center",
-              backgroundColor:  "white",
+              backgroundColor: "white",
             }}
             activeOpacity={item.disabled ? 1 : 0.3}
             onPress={() =>
@@ -148,14 +175,14 @@ useEffect(()=>{
           >
             {item.disabled ? (
               <Text style={{ color: "black" }}>Comming Soon</Text>
-              ) : (
-                item.icon
+            ) : (
+              item.icon
             )}
 
             <Text
               style={{
                 marginTop: Spacing.Small,
-                color:  "black",
+                color: "black",
               }}
             >
               {item.label}
@@ -165,7 +192,7 @@ useEffect(()=>{
       </View>
 
       <TouchableOpacity
-        onPress={()=> navigation.navigate('Groceries')}
+        onPress={() => navigation.navigate("Groceries")}
         style={{
           marginTop: "5%",
           width: "100%",
@@ -174,19 +201,18 @@ useEffect(()=>{
           borderColor: theme.backgroundColor,
           borderRadius: 10,
           overflow: "hidden",
-          display:'flex',
-           flexDirection: "row",
-           justifyContent:'center',
-           alignItems:"center"
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-         <MaterialCommunityIcons
-        size={25}
-        color={theme.backgroundColor}
-        name="fruit-grapes"
-      />
-      <Text style={{ marginLeft: 10 }}>Groceries</Text>
-
+        <MaterialCommunityIcons
+          size={25}
+          color={theme.backgroundColor}
+          name="fruit-grapes"
+        />
+        <Text style={{ marginLeft: 10 }}>Groceries</Text>
       </TouchableOpacity>
 
       <View
@@ -196,8 +222,7 @@ useEffect(()=>{
           flexDirection: "row",
           flexWrap: "wrap",
         }}
-      >
-      </View>
+      ></View>
       <View style={{ marginVertical: 20 }} />
     </ScrollView>
   );
