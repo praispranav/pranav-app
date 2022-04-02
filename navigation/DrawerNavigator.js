@@ -20,7 +20,9 @@ import AccountScreen from "../screens/AccountScreen";
 import Loading from "../components/Loading";
 import Stationary from "../screens/Stationary";
 import Groceries from "../screens/Groceries";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
+import HelpScreen from "../screens/HelpScreen";
+
 
 const removeTOken = async (setTokenRemoved) => {
   await SecureStore.deleteItemAsync("token");
@@ -28,9 +30,20 @@ const removeTOken = async (setTokenRemoved) => {
   // navigation.navigate('LoginScreen')
 };
 
+const getToken = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const result = await SecureStore.getItemAsync("token");
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const LogOutScreen = ({ navigation }) => {
   const [tokenRemoved, setTokenRemoved] = React.useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(true)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(true);
 
   React.useEffect(() => {
     const listner = navigation.addListener("focus", () =>
@@ -38,7 +51,7 @@ const LogOutScreen = ({ navigation }) => {
     );
     return () => listner;
   }, [navigation]);
-  
+
   // React.useEffect(
   //   () =>
   //     navigation.addListener('beforeRemove', (e) => {
@@ -46,12 +59,12 @@ const LogOutScreen = ({ navigation }) => {
   //         // If we don't have unsaved changes, then we don't need to do anything
   //         return;
   //       }
-  //       
+  //
   //     }),
   //   [navigation, hasUnsavedChanges]
   // );
   if (!tokenRemoved) return <Loading />;
-  
+
   return (
     <View
       style={{
@@ -64,16 +77,16 @@ const LogOutScreen = ({ navigation }) => {
     >
       <Text>You Are Successfully LoggedOut</Text>
       <TouchableOpacity
-        onPress={() => navigation.navigate("LoginScreen") }
+        onPress={() => navigation.navigate("LoginScreen")}
         style={{
           backgroundColor: theme.backgroundColorlight,
           borderRadius: 200,
           paddingHorizontal: 10,
           paddingVertical: 4,
-           marginTop: 10
+          marginTop: 10,
         }}
       >
-        <Text style={{ color: 'white'}}>Go To Login</Text>
+        <Text style={{ color: "white" }}>Go To Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -90,10 +103,10 @@ const LogOutScreen = ({ navigation }) => {
 const Drawer = createDrawerNavigator();
 
 export default function App({ navigation, route }) {
- const authState = useSelector(s=> s.auth)
+  const authState = useSelector((s) => s.auth);
 
   const handleAuth = (navigation, route) => {
-    if(authState.isUserAuthorised){
+    if (authState.isUserAuthorised) {
       navigation.navigate(route);
     } else {
       navigation.navigate("LoginScreen");
@@ -121,7 +134,7 @@ export default function App({ navigation, route }) {
 
   const UserButton = ({ navigation }) => (
     <TouchableOpacity
-      onPress={() => handleAuth(navigation, 'Account')}
+      onPress={() => handleAuth(navigation, "Account")}
       style={{
         width: 35,
         height: 35,
@@ -157,24 +170,30 @@ export default function App({ navigation, route }) {
     </TouchableOpacity>
   );
 
-  const HistoryButton = ({ navigation }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("History")}
-      style={{
-        width: 35,
-        height: 35,
-        borderRadius: 25,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: theme.backgroundColorlight,
-        marginLeft: 15,
-        marginTop: 5,
-      }}
-    >
-      <FontAwesome5 name="history" size={15} color="white" />
-    </TouchableOpacity>
-  );
+  const HistoryButton = ({ navigation }) => {
+    if (authState.isUserAuthorised) {
+      return (
+        <TouchableOpacity
+          onPress={() => navigation.navigate("History")}
+          style={{
+            width: 35,
+            height: 35,
+            borderRadius: 25,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme.backgroundColorlight,
+            marginLeft: 15,
+            marginTop: 5,
+          }}
+        >
+          <FontAwesome5 name="history" size={15} color="white" />
+        </TouchableOpacity>
+      );
+    }
+
+    return <View />;
+  };
 
   return (
     <Drawer.Navigator initialRouteName="Home">
@@ -318,29 +337,34 @@ export default function App({ navigation, route }) {
         name={`Stationary`}
         component={Stationary}
       />
-      <Drawer.Screen
-        options={({ navigation }) => {
-          return {
-            title: "Order History",
-            headerTitleAlign: "center",
-            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
-            headerRight: () => (
-              <View style={{ display: "flex", flexDirection: "row" }}>
-                <ShoppingCartButton navigation={navigation} />
-                <UserButton navigation={navigation} />
-              </View>
-            ),
-            headerLeft: () => (
-              <View style={{ display: "flex", flexDirection: "row" }}>
-                <DrawerButton navigation={navigation} />
-              </View>
-            ),
-            headerShadowVisible: false,
-          };
-        }}
-        name="History"
-        component={OrderHistory}
-      />
+      {authState.isUserAuthorised ? (
+        <Drawer.Screen
+          options={({ navigation }) => {
+            return {
+              title: "Order History",
+              headerTitleAlign: "center",
+              headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+              headerRight: () => (
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <ShoppingCartButton navigation={navigation} />
+                  <UserButton navigation={navigation} />
+                </View>
+              ),
+              headerLeft: () => (
+                <View style={{ display: "flex", flexDirection: "row" }}>
+                  <DrawerButton navigation={navigation} />
+                </View>
+              ),
+              headerShadowVisible: false,
+            };
+          }}
+          name="History"
+          component={OrderHistory}
+        />
+      ) : (
+        <></>
+      )}
+
       {false ? (
         <>
           {/* <Drawer.Screen
@@ -392,8 +416,19 @@ export default function App({ navigation, route }) {
           /> */}
         </>
       )}
+
+      <Drawer.Screen
+        options={({ navigation }) => {
+          return {
+            title: "HELP",
+            headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PT_SansBold", marginTop: 5 },
+            headerShadowVisible: false,
+          };
+        }}
+        name={`HELP`}
+        component={HelpScreen}
+      />
     </Drawer.Navigator>
   );
 }
-
-
