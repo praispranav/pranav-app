@@ -46,7 +46,7 @@ export function useQuery(apiUrl) {
       setError({ error: true, errorMessage: error });
       Alert.alert(
         "Error",
-        "Something Went Wrong.",
+        error.response.data.message,
         [
           {
             text: "OK",

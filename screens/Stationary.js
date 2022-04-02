@@ -20,12 +20,12 @@ import { useAddCart } from "../hooks/useAddCart";
 import Modal from "../components/Modal";
 
 
-const Item = ({ item, availableQuantity, discountedPrice, findImage }) => {
+const Item = ({ item, availableQuantity, discountedPrice, findImage, navigation }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
     label: "",
     value: "0",
   });
-  const [addItemToCart, loading] = useAddCart();
+  const [addItemToCart, loading] = useAddCart(navigation);
   return (
     <>
       <View
@@ -336,6 +336,7 @@ export default function fruits({ navigation }) {
             availableQuantity={availableQuantity}
             findImage={findImage}
             discountedPrice={discountedPrice}
+            navigation={navigation}
             item={item}
           />
         );

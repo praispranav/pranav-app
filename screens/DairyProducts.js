@@ -56,12 +56,12 @@ const Data = [
   },
 ];
 
-const Item = ({ item, imageState, availableQuantity }) => {
+const Item = ({ item, imageState, availableQuantity, navigation }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
     label: "",
     value: "0",
   });
-  const [addItemToCart, loading] = useAddCart();
+  const [addItemToCart, loading] = useAddCart(navigation);
   const findImage = (id) => {
     let item1 = "";
     imageState.find((item) => {
@@ -371,6 +371,7 @@ export default function Dairy({ navigation }) {
             item={item}
             imageState={imageState}
             availableQuantity={availableQuantity}
+            navigation={navigation}
           />
         );
       })}

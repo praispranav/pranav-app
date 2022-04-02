@@ -19,12 +19,12 @@ import FontText from "../elements/Text";
 import { useAddCart } from "../hooks/useAddCart";
 import Modal from "../components/Modal";
 
-const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
+const Item = ({ item, discountedPrice, availableQuantity, findImage, navigation }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
     label: "",
     value: "0",
   });
-  const [addItemToCart, loading] = useAddCart();
+  const [addItemToCart, loading] = useAddCart(navigation);
   useEffect(() => {
     setSelectedQuantity(item.initialQuantity);
     console.warn(item.initialQuantity);
@@ -328,6 +328,7 @@ export default function Groceries({ navigation }) {
             findImage={findImage}
             discountedPrice={discountedPrice}
             availableQuantity={availableQuantity}
+            navigation={navigation}
           />
         );
       })}

@@ -51,12 +51,12 @@ import Modal from "../components/Modal";
 //   },
 // ];
 
-const Item = ({ item, discountedPrice, availableQuantity, findImage }) => {
+const Item = ({ item, discountedPrice, availableQuantity, findImage, navigation }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
     label: "",
     value: "0",
   });
-  const [addItemToCart, loading] = useAddCart();
+  const [addItemToCart, loading] = useAddCart(navigation);
   useEffect(() => {
     setSelectedQuantity(item.initialQuantity);
     console.warn(item.initialQuantity);
@@ -311,6 +311,7 @@ export default function NewsPaper({ navigation }) {
             discountedPrice={discountedPrice}
             item={item}
             findImage={findImage}
+            navigation={navigation}
           />
         );
       })}

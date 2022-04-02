@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Alert } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { useSelector } from "react-redux";
 
 const ERROR_INITIAL_STATE = { error: false, errorMessage: "" };
 
@@ -16,11 +17,12 @@ function getValueFor(key) {
   });
 }
 
-export function useAddCart() {
-
+export function useAddCart(navigator) {
+  const authState = useSelector(s=> s.auth)
 
   const [loading, setLoading] = useState(false);
   const fetch = async (productId, quantity) => {
+    if(!authState.isUserAuthorised) return navigator.navigate('LoginScreen')
     console.warn("Quantity", quantity);
     if (Number(quantity) > 0) {
       setLoading(true);

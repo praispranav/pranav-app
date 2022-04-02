@@ -126,6 +126,9 @@ export default function LoginScreen(props) {
   return (
     <ScrollView style={{ display: "flex", flex: 1, backgroundColor:"white" }}>
       <View style={styles.screen}>
+        <View style={{ display:'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
+          <Text style={{ fontFamily: "PT_Sans", fontWeight: 'bold', fontSize: 18 }}>Varad Foods</Text>
+        </View>
         <View style={styles.navigationContainer}>
           <Button
             containerStyle={{
@@ -208,12 +211,13 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: "white",
     padding: Spacing.ExtraLarge + 20,
+    paddingTop: 0,
     marginTop: 40,
     height:'100%'
   },
   navigationContainer: {
     width: "100%",
-    borderRadius: Spacing.ExtraLarge + 15,
+    borderRadius: Spacing.ExtraLarge,
     height:40,
     borderWidth: 1,
     borderColor: "rgb(220,220,220)",

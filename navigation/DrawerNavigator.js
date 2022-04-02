@@ -92,9 +92,9 @@ const Drawer = createDrawerNavigator();
 export default function App({ navigation, route }) {
  const authState = useSelector(s=> s.auth)
 
-  const handleAuth = (navigation) => {
+  const handleAuth = (navigation, route) => {
     if(authState.isUserAuthorised){
-      navigation.navigate("Account");
+      navigation.navigate(route);
     } else {
       navigation.navigate("LoginScreen");
     }
@@ -102,7 +102,7 @@ export default function App({ navigation, route }) {
 
   const ShoppingCartButton = ({ navigation }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate("CartScreen")}
+      onPress={() => handleAuth(navigation, "CartScreen")}
       style={{
         width: 35,
         height: 35,
@@ -121,7 +121,7 @@ export default function App({ navigation, route }) {
 
   const UserButton = ({ navigation }) => (
     <TouchableOpacity
-      onPress={() => handleAuth(navigation)}
+      onPress={() => handleAuth(navigation, 'Account')}
       style={{
         width: 35,
         height: 35,

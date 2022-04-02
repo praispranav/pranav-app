@@ -52,12 +52,12 @@ const Data = [
   },
 ];
 
-const Item = ({ item, availableQuantity, discountedPrice, findImage }) => {
+const Item = ({ item, availableQuantity, discountedPrice, findImage, navigation }) => {
   const [selectedQuantity, setSelectedQuantity] = useState({
     label: "",
     value: "0",
   });
-  const [addItemToCart, loading] = useAddCart();
+  const [addItemToCart, loading] = useAddCart(navigation);
   return (
     <>
       <View
@@ -369,6 +369,7 @@ export default function fruits({ navigation }) {
             findImage={findImage}
             discountedPrice={discountedPrice}
             item={item}
+            navigation={navigation}
           />
         );
       })}
