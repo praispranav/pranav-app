@@ -97,20 +97,21 @@ const Item = ({ item, imageState, availableQuantity, navigation }) => {
                 style={{ width: 70, height: 70, borderRadius: 5 }}
               />
               {item.subscription == 1 ? (
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: -10,
-                    backgroundColor: theme.backgroundColor,
-                    borderRadius: 100,
-                    padding: 5,
-                    right: 6,
-                  }}
-                >
-                  <Text style={{ fontSize: 10, color: "white" }}>
-                    Subscription
-                  </Text>
-                </View>
+               <View
+               style={{
+                 position: "absolute",
+                 bottom: -10,
+                 backgroundColor: theme.backgroundColor,
+                 borderRadius: 100,
+                 padding: 5,
+                 paddingVertical: 2,
+                 right: 6,
+               }}
+               >
+                 <Text style={{ fontSize: 9, color: "white" }}>
+                   Subscription
+                 </Text>
+               </View>
               ) : (
                 <></>
               )}

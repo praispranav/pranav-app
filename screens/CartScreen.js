@@ -266,16 +266,17 @@ function NormalProducts({ item, setCalculate, availableQuantity, fetchList }) {
             />
             {item.subscription == 1 ? (
               <View
-                style={{
-                  position: "absolute",
-                  bottom: -10,
-                  backgroundColor: theme.backgroundColor,
-                  borderRadius: 100,
-                  padding: 5,
-                  right: 6,
-                }}
+              style={{
+                position: "absolute",
+                bottom: -10,
+                backgroundColor: theme.backgroundColor,
+                borderRadius: 100,
+                padding: 5,
+                paddingVertical: 2,
+                right: 6,
+              }}
               >
-                <Text style={{ fontSize: 10, color: "white" }}>
+                <Text style={{ fontSize: 9, color: "white" }}>
                   Subscription
                 </Text>
               </View>
