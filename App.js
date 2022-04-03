@@ -13,7 +13,8 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./redux/store";
 
 // axios.defaults.baseURL = "http://192.168.1.70:3000"
-axios.defaults.baseURL = "https://hris-backend-api.azurewebsites.net/";
+// axios.defaults.baseURL = "https://hris-backend-api.azurewebsites.net/";
+axios.defaults.baseURL = "https://guarded-oasis-28338.herokuapp.com/";
 
 const INITIAL_STATE_LOADING = {
   loadingFont: true,
