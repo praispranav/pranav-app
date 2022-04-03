@@ -4,14 +4,17 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  ActivityIndicator,Alert, ScrollView
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  ToastAndroid,
 } from "react-native";
 import { Spacing } from "../constants/MarginPadding";
 import routes from "../config/routes.json";
 import Button from "../components/Button";
 // import Input from "../components/TextInput";
 import Text from "../elements/Text";
-import { TextInput as Input, Headline } from 'react-native-paper'
+import { TextInput as Input, Headline } from "react-native-paper";
 import theme from "../config/theme";
 import axios from "axios";
 
@@ -27,7 +30,18 @@ export default function LoginScreen(props) {
 
   const [loading, setLoading] = useState(false);
 
+  const showToast = (message) => {
+    ToastAndroid.show(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+  };
+
   const submit = async () => {
+    var re = /\S+@\S+\.\S+/;
+    if (name.length < 5) return showToast("Name must be 6 characters long");
+    if (Number(phone) < 1000000000 || Number(phone) > 9999999999)
+      showToast("Phone must be of 10 digits");
+    if (re.test(email) == false) return showToast("Properly fill email field.");
+    if (password.length < 6 && password !== password2)
+      return showToast("Password must be same and must be at least 6.");
     try {
       setLoading(true);
       const response = await axios.post("/user/auth/register", {
@@ -74,12 +88,32 @@ export default function LoginScreen(props) {
     }
   };
 
-  return (
-    <ScrollView style={{ display: "flex", flex: 1, backgroundColor:"white" }}>
+  React.useEffect(()=>{
+    props.navigation.addListener(()=>{
+      setName("");
+      setEmail("");
+      setPassword("");
+      setPassword2("");
+      setPhone("");
+    })
+  },[props.navigation])
 
+  return (
+    <ScrollView style={{ display: "flex", flex: 1, backgroundColor: "white" }}>
       <View style={styles.screen}>
-      <View style={{ display:'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
-          <Text style={{ fontFamily: "PT_Sans", fontWeight: 'bold', fontSize: 18 }}>Varad Foods</Text>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            marginBottom: 20,
+          }}
+        >
+          <Text
+            style={{ fontFamily: "PT_Sans", fontWeight: "bold", fontSize: 18 }}
+          >
+            Varad Foods
+          </Text>
         </View>
         <View style={styles.navigationContainer}>
           <Button
@@ -100,14 +134,16 @@ export default function LoginScreen(props) {
         </View>
         <View style={{ marginVertical: Spacing.ExtraLarge }}>
           <View style={{ marginTop: Spacing.Normal }}>
-            <Input mode="outlined"
+            <Input
+              mode="outlined"
               placeholder={"Enter Your Email Here"}
               value={email}
               onChangeText={setEmail}
             />
           </View>
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input mode="outlined"
+            <Input
+              mode="outlined"
               placeholder={"Enter Your Name"}
               value={name}
               onChangeText={setName}
@@ -115,7 +151,8 @@ export default function LoginScreen(props) {
           </View>
 
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input mode="outlined"
+            <Input
+              mode="outlined"
               placeholder={"Enter Your Mobile Here"}
               value={phone}
               onChangeText={setPhone}
@@ -123,7 +160,8 @@ export default function LoginScreen(props) {
           </View>
 
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input mode="outlined"
+            <Input
+              mode="outlined"
               placeholder={"Enter Your Password Here"}
               value={password}
               onChangeText={setPassword}
@@ -131,7 +169,8 @@ export default function LoginScreen(props) {
             />
           </View>
           <View style={{ marginTop: Spacing.ExtraLarge + 5 }}>
-            <Input mode="outlined"
+            <Input
+              mode="outlined"
               placeholder={"Enter Your Password Here"}
               value={password2}
               onChangeText={setPassword2}
@@ -161,7 +200,7 @@ export default function LoginScreen(props) {
                 borderRadius: Spacing.ExtraLarge,
               }}
               textStyle={{ color: "white" }}
-              text={loading ? <ActivityIndicator color="white"/> : "Signup"}
+              text={loading ? <ActivityIndicator color="white" /> : "Signup"}
             />
           </View>
         </View>
@@ -177,8 +216,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: "white",
     padding: Spacing.ExtraLarge + 20,
-    paddingTop:0,
-    marginTop: 40
+    paddingTop: 0,
+    marginTop: 40,
   },
   navigationContainer: {
     width: "100%",

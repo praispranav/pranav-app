@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Alert,ScrollView
+  Alert,ScrollView, ToastAndroid
 } from "react-native";
 import { Spacing } from "../constants/MarginPadding";
 import routes from "../config/routes.json";
@@ -50,6 +50,8 @@ export default function LoginScreen(props) {
   const [token, setToken] = useState('')
 
   const submit = async () => {
+    if(username.length < 6) return ToastAndroid.show("Please Fill Username", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
+    if(password.length < 6) return ToastAndroid.show("Please Fill Password", ToastAndroid.SHORT, ToastAndroid.BOTTOM)
     try {
       setLoading(true);
       const response = await axios.post("/user/auth/login", {
@@ -107,6 +109,8 @@ export default function LoginScreen(props) {
     const unsubscribe = props.navigation.addListener("focus", async () => {
       
       try {
+        setUsername("");
+        setPassword("");
         if(token.length > 100){
           props.navigation.navigate("Drawer");
         }
